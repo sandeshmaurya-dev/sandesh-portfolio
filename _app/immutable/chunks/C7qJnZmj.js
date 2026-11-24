@@ -1,0 +1,1 @@
+function e(e){return{language:e,resolution:{cover:{role:``,lede:``,portrait:``},works:{lede:``,pieces:[]},practice:{lede:``,disciplines:[],kin:{}},taste:{lede:``,items:[]},contact:{statement:[``,``],email:``,portrait:``}},notes:{stations:Array.from({length:9},(e,t)=>({station:t+1,note:null}))}}}export{e as t};

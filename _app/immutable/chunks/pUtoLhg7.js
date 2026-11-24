@@ -1,0 +1,1 @@
+var e=[`essay`,`photographs`,`log`,`letter`],t=[`essay`,`note`,`log`,`field-note`,`photographs`,`letter`],n=[`words`,`guest`,`editor`,`photographs`,`testing`,`translation`],r=[`words`,`guest`],i=[`column`,`wide`,`bleed`,`margin`];export{n as a,e as i,i as n,t as r,r as t};

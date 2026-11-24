@@ -1,0 +1,1 @@
+import{Ot as e}from"./CDrkfc4T.js";import{n as t,t as n}from"./DZe6P2OK.js";import{t as r}from"./BIvdVdaG.js";import{t as i}from"./C7qJnZmj.js";var a=e({sheetData:()=>o}),o=new t(n,{fetch:async e=>{let t=await r.sheet(e);return t.ok?t.value:null},fallback:e=>i(e)});export{a as n,o as t};

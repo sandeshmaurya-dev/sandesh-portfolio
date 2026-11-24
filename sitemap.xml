@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+	<url>
+		<loc>https://birkar.me/</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi"/>
+		<xhtml:link rel="alternate" hreflang="x-default" href="https://birkar.me"/>
+		<changefreq>monthly</changefreq>
+		<priority>1.0</priority>
+	</url>
+	<url>
+		<loc>https://birkar.me/fa</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi"/>
+		<xhtml:link rel="alternate" hreflang="x-default" href="https://birkar.me"/>
+		<changefreq>monthly</changefreq>
+		<priority>0.9</priority>
+	</url>
+	<url>
+		<loc>https://birkar.me/ckb</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi"/>
+		<xhtml:link rel="alternate" hreflang="x-default" href="https://birkar.me"/>
+		<changefreq>monthly</changefreq>
+		<priority>0.9</priority>
+	</url>
+	<url>
+		<loc>https://birkar.me/kmr</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi"/>
+		<xhtml:link rel="alternate" hreflang="x-default" href="https://birkar.me"/>
+		<changefreq>monthly</changefreq>
+		<priority>0.9</priority>
+	</url>
+	<url>
+		<loc>https://birkar.me/fi</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi"/>
+		<xhtml:link rel="alternate" hreflang="x-default" href="https://birkar.me"/>
+		<changefreq>monthly</changefreq>
+		<priority>0.9</priority>
+	</url>
+	<url>
+		<loc>https://birkar.me/notes/draw-on-change</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/notes/draw-on-change"/>
+		<lastmod>2026-10-25</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/fa/notes/light-arrives-already-bent</loc>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa/notes/light-arrives-already-bent"/>
+		<lastmod>2026-10-25</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/ckb/notes/bir</loc>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb/notes/bir"/>
+		<lastmod>2026-10-25</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/notes/the-parts-nobody-sees</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/notes/the-parts-nobody-sees"/>
+		<lastmod>2026-10-25</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/notes/samples-and-the-photos</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/notes/samples-and-the-photos"/>
+		<lastmod>2026-10-25</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/notes/a-roads-loop</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/notes/a-roads-loop"/>
+		<lastmod>2026-10-25</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/fi/notes/instruments-lie-quietly</loc>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi/notes/instruments-lie-quietly"/>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/notes/instruments-lie-quietly"/>
+		<lastmod>2026-10-30</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/notes/instruments-lie-quietly</loc>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi/notes/instruments-lie-quietly"/>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/notes/instruments-lie-quietly"/>
+		<lastmod>2026-10-30</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/kmr/notes/offline-is-a-place</loc>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr/notes/offline-is-a-place"/>
+		<lastmod>2026-10-25</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/notes/the-autumn-light</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/notes/the-autumn-light"/>
+		<lastmod>2026-10-25</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/fa/notes/welcome</loc>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa/notes/welcome"/>
+		<lastmod>2026-11-01</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/works/evin</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/works/evin"/>
+		<lastmod>2026-10-23</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/works/wormholekernel</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/works/wormholekernel"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa/works/wormholekernel"/>
+		<lastmod>2026-10-24</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/fa/works/wormholekernel</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/works/wormholekernel"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa/works/wormholekernel"/>
+		<lastmod>2026-10-24</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/people/birkar</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi/people/birkar"/>
+		<lastmod>2026-11-07</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/fa/people/birkar</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi/people/birkar"/>
+		<lastmod>2026-11-07</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/ckb/people/birkar</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi/people/birkar"/>
+		<lastmod>2026-11-07</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/kmr/people/birkar</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi/people/birkar"/>
+		<lastmod>2026-11-07</lastmod>
+	</url>
+	<url>
+		<loc>https://birkar.me/fi/people/birkar</loc>
+		<xhtml:link rel="alternate" hreflang="en" href="https://birkar.me/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fa" href="https://birkar.me/fa/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="ku" href="https://birkar.me/kmr/people/birkar"/>
+		<xhtml:link rel="alternate" hreflang="fi" href="https://birkar.me/fi/people/birkar"/>
+		<lastmod>2026-11-07</lastmod>
+	</url>
+</urlset>

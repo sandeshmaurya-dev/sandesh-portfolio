@@ -1,0 +1,1 @@
+function e(...e){let t=[...e],n=!1;return{add(e){n?e():t.push(e)},dispose(){if(!n){n=!0;for(let e=t.length-1;e>=0;--e)t[e]();t.length=0}}}}export{e as t};

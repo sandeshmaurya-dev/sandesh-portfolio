@@ -1,0 +1,1 @@
+var e={names:[],kinds:[],screen:new Float32Array(32),depth:new Float32Array(16),visible:new Uint8Array(16),version:0,count:0};function t(e){return e.includes(`cup`)?`cup`:e.includes(`grass`)?`grass`:`chair`}function n(){e.names.length=0,e.kinds.length=0,e.visible.fill(0),e.count=0,e.version+=1}export{e as n,n as r,t};
