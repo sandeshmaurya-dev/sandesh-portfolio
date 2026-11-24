@@ -1,0 +1,146 @@
+.mat.svelte-vue9m0 {
+  --mat-band: calc(
+    var(--page-mat, 2.25rem) * var(--mount, 0) * var(--presence, 1)
+  );
+  --lock: 11px;
+  z-index: 45;
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+}
+.mat[data-contained].svelte-vue9m0 {
+  z-index: 0;
+  position: absolute;
+}
+.mat__furniture.svelte-vue9m0,
+.mat__edge.svelte-vue9m0,
+.mat__lock.svelte-vue9m0,
+.mat__slug.svelte-vue9m0 {
+  position: absolute;
+}
+.mat__furniture.svelte-vue9m0 {
+  background: var(--hatch-pattern), var(--ground, var(--surface));
+  transition: background-color var(--duration-world) var(--ease-in-out-quart);
+  background-attachment: fixed, scroll;
+}
+.mat__furniture[data-side="top"].svelte-vue9m0 {
+  height: var(--mat-band);
+  inset: 0 0 auto;
+}
+.mat__furniture[data-side="bottom"].svelte-vue9m0 {
+  height: var(--mat-band);
+  inset: auto 0 0;
+}
+.mat__furniture[data-side="start"].svelte-vue9m0,
+.mat__furniture[data-side="end"].svelte-vue9m0 {
+  top: var(--mat-band);
+  bottom: var(--mat-band);
+  width: var(--mat-band);
+}
+.mat__furniture[data-side="start"].svelte-vue9m0 {
+  inset-inline-start: 0;
+}
+.mat__furniture[data-side="end"].svelte-vue9m0 {
+  inset-inline-end: 0;
+}
+.mat__edge.svelte-vue9m0 {
+  inset: var(--mat-band);
+  border: 1px solid var(--hatch-edge);
+  opacity: calc(var(--mount, 0) * var(--presence, 1));
+}
+.mat__lock.svelte-vue9m0 {
+  width: var(--lock);
+  height: var(--lock);
+  opacity: calc(var(--mount, 0) * var(--presence, 1));
+  translate: -50% -50%;
+}
+.mat__lock.svelte-vue9m0:before,
+.mat__lock.svelte-vue9m0:after {
+  content: "";
+  background: var(--ink);
+  position: absolute;
+}
+.mat__lock.svelte-vue9m0:before {
+  inset-inline: 0;
+  height: 1px;
+  top: calc(50% - 0.5px);
+}
+.mat__lock.svelte-vue9m0:after {
+  inset-block: 0;
+  width: 1px;
+  left: calc(50% - 0.5px);
+}
+.mat__lock[data-corner^="top"].svelte-vue9m0 {
+  top: var(--mat-band);
+}
+.mat__lock[data-corner^="bottom"].svelte-vue9m0 {
+  top: calc(100% - var(--mat-band));
+}
+.mat__lock[data-corner$="start"].svelte-vue9m0 {
+  left: var(--mat-band);
+}
+.mat__lock[data-corner$="end"].svelte-vue9m0,
+.mat.svelte-vue9m0:is(
+    :lang(ae),
+    :lang(ar),
+    :lang(arc),
+    :lang(bcc),
+    :lang(bqi),
+    :lang(ckb),
+    :lang(dv),
+    :lang(fa),
+    :lang(glk),
+    :lang(he),
+    :lang(ku),
+    :lang(mzn),
+    :lang(nqo),
+    :lang(pnb),
+    :lang(ps),
+    :lang(sd),
+    :lang(ug),
+    :lang(ur),
+    :lang(yi)
+  )
+  .mat__lock[data-corner$="start"]:where(.svelte-vue9m0) {
+  left: calc(100% - var(--mat-band));
+}
+.mat.svelte-vue9m0:is(
+    :lang(ae),
+    :lang(ar),
+    :lang(arc),
+    :lang(bcc),
+    :lang(bqi),
+    :lang(ckb),
+    :lang(dv),
+    :lang(fa),
+    :lang(glk),
+    :lang(he),
+    :lang(ku),
+    :lang(mzn),
+    :lang(nqo),
+    :lang(pnb),
+    :lang(ps),
+    :lang(sd),
+    :lang(ug),
+    :lang(ur),
+    :lang(yi)
+  )
+  .mat__lock[data-corner$="end"]:where(.svelte-vue9m0) {
+  left: var(--mat-band);
+}
+.mat__slug.svelte-vue9m0 {
+  inset-inline-end: calc(var(--mat-band) + 1.5rem);
+  bottom: calc(var(--mat-band) / 2);
+  background: var(--ground, var(--surface));
+  color: var(--ink-soft);
+  white-space: nowrap;
+  opacity: calc(var(--mount, 0) * var(--presence, 1));
+  transition: background-color var(--duration-world) var(--ease-in-out-quart);
+  padding-inline: 0.6em;
+  translate: 0 50%;
+}
+@media (width<=760px) {
+  .mat.svelte-vue9m0 {
+    display: none;
+  }
+}

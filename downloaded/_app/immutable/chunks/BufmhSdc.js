@@ -1,0 +1,1 @@
+var e={point:.35,line:3.8,plane:1.1,land:.65},t=e.point+e.line+e.plane+e.land,n=.6,r={home:.35,flight:.72,dwell:.5,end:.8},i=r.home+10*r.flight+9*r.dwell+r.end,a=t+i,o=n+i;export{a,t as i,o as n,r as o,e as r,n as t};

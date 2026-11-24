@@ -1,0 +1,1 @@
+var e=class{elapsed=0;delta=0;#e=0;tick(e,t,n,r=60){this.#e+=e;let i=Math.max(t,1)/Math.max(r,1);return this.#e+n/1e3*.6<i?(this.delta=0,0):(this.delta=this.#e,this.elapsed+=this.#e,this.#e=0,this.delta)}release(e){return this.delta=this.#e+e,this.elapsed+=this.delta,this.#e=0,this.delta}};export{e as t};

@@ -1,0 +1,1 @@
+var e=1100,t=1.2,n={wide:{columns:[2,4,8,10],rows:[4,8]},compact:{columns:[4,8],rows:[3,6,9]}},r=(e,t)=>e<=820||e<=1100&&t>=e*1.2,i=(e,t)=>r(e,t)?n.compact:n.wide,a=(e,t)=>e*t/12,o=(e,t)=>e*t/12;export{r as a,a as i,e as n,i as o,n as r,o as s,t};

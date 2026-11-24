@@ -1,0 +1,1 @@
+import{vt as e,yt as t}from"../chunks/CDrkfc4T.js";import"../chunks/xihTtKlq.js";import{t as n}from"../chunks/CefzGin_.js";function r(r,i){t(i,!0),n(r,{get tag(){return i.data.tag},mode:`register`,get words(){return i.data.words}}),e()}export{r as component};

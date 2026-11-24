@@ -1,0 +1,15 @@
+{
+  "webgl_libraries": [
+    "OGL (minimal WebGL)"
+  ],
+  "shaders": [],
+  "components": [],
+  "api_structure": [
+    "cover",
+    "works",
+    "practice",
+    "taste",
+    "contact"
+  ],
+  "interesting_patterns": []
+}

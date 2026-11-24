@@ -1,0 +1,1 @@
+import{n as e,t}from"./DZe6P2OK.js";import{n}from"./BpM8PMKi.js";var r={notes:[],projects:[],languages:[],words:0},i=new e(t,{fetch:async e=>{let t=await n(`/api/record/${e}`);return t.ok?t.value:null},fallback:()=>r});export{i as t};

@@ -1,0 +1,1 @@
+import{t as e}from"./DZIrMK9l.js";var t=`birkar`;function n(e,t){return e.written[t]??e.name}function r(e,t){return e.about[t]??e.about.en??null}function i(t,n){return e.path(n,`/people/${t}`)}function a(e){return{handle:e,kind:`person`,name:e,written:{},about:{},page:!1,avatar:null,sample:!1,account:null}}function o(e,t){return e[t]??a(t)}export{i as a,n as i,r as n,o as r,t};

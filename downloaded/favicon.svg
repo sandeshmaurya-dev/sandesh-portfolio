@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Şaho Bîrkar">
+	<!-- The lens, at 32px: a shadow, its ring, and the sheet crossing it.
+	     Mid-tone strokes so the mark holds on a light tab and on a dark one. -->
+	<circle cx="16" cy="16" r="8.4" fill="#101115" />
+	<circle cx="16" cy="16" r="9.9" fill="none" stroke="#9a9aa4" stroke-width="1.5" />
+	<ellipse
+		cx="16"
+		cy="16"
+		rx="15"
+		ry="4.1"
+		fill="none"
+		stroke="#9a9aa4"
+		stroke-width="1.6"
+		transform="rotate(-14 16 16)"
+	/>
+</svg>

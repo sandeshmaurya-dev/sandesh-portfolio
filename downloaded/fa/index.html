@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-script="arab" class="no-js" data-world="paper">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+
+		<meta name="color-scheme" content="light dark" />
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020205" />
+
+		<script>
+			/**
+			 * Resolve the world before the first pixel.
+			 *
+			 * Render-blocking on purpose, and a few hundred bytes: a flash of the
+			 * wrong world would undo the whole conceit, and it cannot be fixed
+			 * after paint. A stored choice wins over the system preference, because
+			 * a visitor who picked one meant it.
+			 */
+			(function () {
+				var root = document.documentElement;
+				root.classList.remove('no-js');
+				try {
+					var stored = localStorage.getItem('birkar:world');
+					var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					root.dataset.world =
+						stored === 'void' || stored === 'paper' ? stored : dark ? 'void' : 'paper';
+					// The chrome in the world chosen, not the system's: the page's own ground in each.
+					var chrome = document.querySelectorAll('meta[name="theme-color"]');
+					for (var i = 0; i < chrome.length; i++) {
+						chrome[i].content = root.dataset.world === 'void' ? '#020205' : '#ffffff';
+					}
+				} catch (error) {
+					/* Storage denied — the markup default stands. */
+				}
+				/*
+				 * The mount the visitor chose earlier in the visit, before the first
+				 * pixel: a page opened after the choice is laid out in it from its
+				 * first frame (`world/mount`).
+				 */
+				try {
+					var mount = sessionStorage.getItem('birkar:mount');
+					if (mount === 'framed' || mount === 'unframed') {
+						root.dataset.mount = mount;
+						root.style.setProperty('--mount', mount === 'framed' ? '1' : '0');
+					}
+				} catch (error) {
+					/* Storage denied — every page opens unframed. */
+				}
+				/*
+				 * A language once chosen is the one the root opens in: a reader who
+				 * changed the sheet to Persian is sent to Persian's page before
+				 * anything is drawn in English. Only the root — an address that
+				 * names a language is the reader's to keep — and only for a language
+				 * the site has (`content/locales.ts`; the tests hold the two lists
+				 * together).
+				 */
+				try {
+					var chosen = localStorage.getItem('birkar:language');
+					var languages = ['fa', 'ckb', 'kmr', 'fi'];
+					if (location.pathname === '/' && languages.indexOf(chosen) !== -1) {
+						location.replace('/' + chosen + location.search + location.hash);
+					}
+				} catch (error) {
+					/* Storage denied — the page is read in the language its address names. */
+				}
+				/*
+				 * Where the sheet sets its reader down (`world/boot`'s destination): a
+				 * place the history gave back — Back, Forward, a reload — kept in the
+				 * entry's own state (`$navigation/place`), or a sector the address names.
+				 * Chosen here, before the first paint, so the opening names where it is
+				 * taking the reader from its first frame; the page chooses again by the
+				 * same rule once it runs (`+page`). Where there is one, the page — not
+				 * the browser — decides where the document stands.
+				 */
+				try {
+					var timing = performance.getEntriesByType('navigation')[0];
+					var given = timing && (timing.type === 'reload' || timing.type === 'back_forward');
+					var place = given && history.state && history.state['kernel:place'];
+					var named = /^#sector-([a-z-]+)$/.exec(location.hash);
+					if (place && (place.y > 2 || place.anchor !== 'lens')) {
+						root.dataset.destination = place.anchor || 'lens';
+					} else if (named) {
+						root.dataset.destination = named[1];
+					}
+					if (root.dataset.destination) history.scrollRestoration = 'manual';
+				} catch (error) {
+					/* No history to read — the page opens at its top. */
+				}
+				/*
+				 * A crossing's arriving half (`$navigation/crossing`, which holds the
+				 * leaving half and the names both are written to): before this page's
+				 * first frame, which is before any module has run, name what travels
+				 * here — every `data-crossing`, and one bound for an address only when
+				 * that is the address the reader came from — say which way the crossing
+				 * goes, and take the names back once it has landed. A reload, an address
+				 * replaced, and motion reduced are never drawn.
+				 */
+				addEventListener('pagereveal', function (event) {
+					var transition = event.viewTransition;
+					if (!transition) return;
+					var activation = window.navigation && window.navigation.activation;
+					var kind = activation && activation.navigationType;
+					var from = activation && activation.from && activation.from.url;
+					var path = function (value) {
+						var p = new URL(value, location.href).pathname;
+						return p.length > 1 ? p.replace(/\/+$/, '') : p;
+					};
+					if (
+						!from ||
+						kind === 'reload' ||
+						kind === 'replace' ||
+						new URL(from).origin !== location.origin ||
+						path(from) === path(location.href) ||
+						matchMedia('(prefers-reduced-motion: reduce)').matches
+					) {
+						transition.skipTransition();
+						return;
+					}
+					var back = kind === 'traverse' && activation.entry.index < activation.from.index;
+					if (transition.types) {
+						transition.types.add(back ? 'back' : 'forward');
+						// This side's own: what only the page arriving draws (`styles/crossings.css`).
+						transition.types.add('arriving');
+						// …and what kind of page it is, by its address, whatever its language.
+						var page =
+							path(location.href).replace(
+								new RegExp('^/(?:' + languages.join('|') + ')(?=/|$)'),
+								''
+							) || '/';
+						var to = /^\/(works|notes|people|account)\//.exec(page + '/');
+						transition.types.add(page === '/' ? 'sheet' : to ? to[1] : 'page');
+					}
+					var named = [];
+					var seen = {};
+					// While a scope stands over the page (the sheet's opening), only what is in it travels.
+					var scope = document.querySelector('[data-crossing-scope]') || document;
+					var travelers = scope.querySelectorAll('[data-crossing]');
+					for (var t = 0; t < travelers.length; t++) {
+						var element = travelers[t];
+						var name = element.getAttribute('data-crossing');
+						var bound = element.getAttribute('data-crossing-to');
+						if (!name || seen[name] || (bound !== null && path(bound) !== path(from))) continue;
+						// One that is not drawn does not travel, and leaves its name to one that is.
+						if (!element.getClientRects().length) continue;
+						seen[name] = true;
+						element.style.viewTransitionName = name;
+						var kind = element.getAttribute('data-crossing-class');
+						if (kind) element.style.setProperty('view-transition-class', kind);
+						named.push(element);
+					}
+					transition.finished.finally(function () {
+						for (var n = 0; n < named.length; n++) {
+							named[n].style.removeProperty('view-transition-name');
+							named[n].style.removeProperty('view-transition-class');
+						}
+					});
+				});
+			})();
+		</script>
+
+		<meta http-equiv="content-security-policy" content="default-src 'self'; worker-src 'self' blob:; connect-src 'self' blob:; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; object-src 'none'; script-src 'self' 'wasm-unsafe-eval' 'sha256-6ORIrCu8qD8jZzY85oAOPHh+oiYs/+G8AA8y/6FzNzg=' 'sha256-GUbqugMchMM6CP1SX25VWY85iUemgf7UNUtYpUkiuGE='; style-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self'">
+		<link href="./_app/immutable/entry/start.DZAEokQm.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CAy1iyL3.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CDrkfc4T.js" rel="modulepreload">
+		<link href="./_app/immutable/entry/app.DiN7Zou7.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CtT0-S4g.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DZIrMK9l.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/xihTtKlq.js" rel="modulepreload">
+		<link href="./_app/immutable/nodes/0.DGXM6sAV.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/vDJh05qf.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CT_s9e-q.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DZe6P2OK.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/jF2Q2vpH.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/7coZx_mz.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BnXxqU9U.js" rel="modulepreload">
+		<link href="./_app/immutable/nodes/3.C3Oy6EHJ.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/ClzaPqxo.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/B2qhPrH1.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CFsHJiG0.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CHqItGKm.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/ELPGrdcT.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/tZjf1JQz.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DshTci0C.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/4PqWFOE5.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/Cwkimsmu.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DE9lj6oS.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BWwkEbyN.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/D4fSs-Sq.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/Kt4jKIWV.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DX9BrXbc.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DGrPXTm2.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/fz24hlwT.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DH6IKBpL.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CWMWuTl2.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/ZkLX3LGz.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/NL_OVwQu.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CfPuRZE9.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DfZJtqBB.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/Chcx0Btt.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/C-Azehd7.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DTZXWq7l.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DrsOisCf.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DXKhITYR.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BoD1nBb4.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/Dgk3esDI.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BPJFpaph.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CF5YSoqB.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CTxxzrZ3.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/D-FBN6o0.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BdkBDNTL.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BcCocoV3.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DjAx3H9w.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BufmhSdc.js" rel="modulepreload">
+		
+		<style>.cursor.svelte-w2h8sw{z-index:900;pointer-events:none;top:0;left:0;color:inherit;opacity:0;transition:opacity .26s var(--ease-out-quint);mix-blend-mode:difference;will-change:transform;background:0 0;border:0;margin:0;padding:0;position:fixed;inset:0 auto auto 0;overflow:visible}.cursor.svelte-w2h8sw[data-ink]{mix-blend-mode:normal;filter:drop-shadow(0 0 .6px var(--edge)) drop-shadow(0 0 .6px var(--edge)) drop-shadow(0 0 .6px var(--edge))}.cursor--visible.svelte-w2h8sw{opacity:1}.cursor.svelte-w2h8sw{--mark:#fff;--edge:transparent;--ring:18px;--arm:26px;--gap:0px}.cursor--labeled.svelte-w2h8sw,.cursor[data-mode=link].svelte-w2h8sw{--ring:32px;--arm:9px}.cursor[data-mode=lens].svelte-w2h8sw{--ring:46px;--arm:66px;--gap:14px}.cursor[data-mode=disabled].svelte-w2h8sw{--ring:14px;--arm:14px}.cursor--visible[data-mode=disabled].svelte-w2h8sw{opacity:.4}.cursor--visible[data-mode=text].svelte-w2h8sw{opacity:0}.cursor__ring.svelte-w2h8sw{width:var(--ring);height:var(--ring);margin:calc(var(--ring) / -2) 0 0 calc(var(--ring) / -2);border:1px solid var(--mark);transition:width .42s var(--ease-out-expo), height .42s var(--ease-out-expo), margin .42s var(--ease-out-expo), opacity .26s var(--ease-out-quint);border-radius:50%;position:absolute;top:0;left:0}.cursor__tick.svelte-w2h8sw{transition:width .42s var(--ease-out-expo), height .42s var(--ease-out-expo), --gap .42s var(--ease-out-expo), opacity .26s var(--ease-out-quint);position:absolute;top:0;left:0;translate:-50% -50%}.cursor__tick--x.svelte-w2h8sw{width:var(--arm);background:linear-gradient(to right, var(--mark) calc(50% - var(--gap) / 2), transparent 0 calc(50% + var(--gap) / 2), var(--mark) 0);height:1px}.cursor__tick--y.svelte-w2h8sw{width:1px;height:var(--arm);background:linear-gradient(to bottom, var(--mark) calc(50% - var(--gap) / 2), transparent 0 calc(50% + var(--gap) / 2), var(--mark) 0)}@property --gap{syntax:"<length>";inherits:true;initial-value:0}.cursor[data-form=none].svelte-w2h8sw{visibility:hidden}.cursor__dot.svelte-w2h8sw{background:var(--mark);opacity:0;width:4px;height:4px;transition:opacity .26s var(--ease-out-quint), scale .42s var(--ease-out-expo);border-radius:50%;position:absolute;top:-2px;left:-2px;scale:.2}.cursor[data-form=sun].svelte-w2h8sw{--ring:22px;--arm:0px}.cursor[data-form=sun].cursor--labeled.svelte-w2h8sw,.cursor[data-form=sun][data-mode=link].svelte-w2h8sw{--ring:32px}.cursor[data-form=sun].svelte-w2h8sw .cursor__dot:where(.svelte-w2h8sw){opacity:1;scale:1}.cursor[data-form=sun].svelte-w2h8sw .cursor__tick:where(.svelte-w2h8sw){opacity:0}.cursor__pixel.svelte-w2h8sw{border:1px solid var(--mark);opacity:0;width:22px;height:22px;transition:width .34s var(--ease-out-expo), height .34s var(--ease-out-expo), margin .34s var(--ease-out-expo), opacity .2s var(--ease-out-quint), scale .34s var(--ease-out-expo);margin:-11px 0 0 -11px;position:absolute;top:0;left:0;scale:.6}.cursor__pixel-tick.svelte-w2h8sw{background:var(--mark);position:absolute;top:50%;left:50%;translate:-50% -50%}.cursor__pixel-tick--x.svelte-w2h8sw{width:9px;height:1px}.cursor__pixel-tick--y.svelte-w2h8sw{width:1px;height:9px}.cursor[data-form=pixel].svelte-w2h8sw .cursor__pixel:where(.svelte-w2h8sw){opacity:1;scale:1}.cursor[data-form=pixel].cursor--labeled.svelte-w2h8sw .cursor__pixel:where(.svelte-w2h8sw),.cursor[data-form=pixel][data-mode=link].svelte-w2h8sw .cursor__pixel:where(.svelte-w2h8sw){width:30px;height:30px;margin:-15px 0 0 -15px}.cursor__sort.svelte-w2h8sw{opacity:0;transition:opacity .22s var(--ease-out-quint), scale .42s var(--ease-out-expo);position:absolute;top:-24px;left:-24px;overflow:visible;scale:.5}.cursor__edges.svelte-w2h8sw{fill:none;stroke:var(--mark);stroke-width:1px;stroke-linecap:square;vector-effect:non-scaling-stroke}.cursor__edges--hidden.svelte-w2h8sw{stroke-dasharray:1.5 2.5;stroke-opacity:.7;transition:stroke-opacity .22s var(--ease-out-quint)}.cursor[data-subject].svelte-w2h8sw .cursor__edges--hidden:where(.svelte-w2h8sw){stroke-opacity:0}.cursor__letter.svelte-w2h8sw{fill:var(--mark);font-family:var(--font-cast);text-anchor:middle;dominant-baseline:central;animation:svelte-w2h8sw-set .38s var(--ease-out-expo) both;font-size:16px}@keyframes svelte-w2h8sw-set{0%{opacity:0;scale:.4}}.cursor[data-form=sort].svelte-w2h8sw .cursor__sort:where(.svelte-w2h8sw){opacity:1;scale:1}.cursor[data-form=sort].cursor--labeled.svelte-w2h8sw .cursor__sort:where(.svelte-w2h8sw),.cursor[data-form=sort][data-mode=link].svelte-w2h8sw .cursor__sort:where(.svelte-w2h8sw){scale:1.3}.cursor[data-form=pixel].svelte-w2h8sw .cursor__ring:where(.svelte-w2h8sw),.cursor[data-form=pixel].svelte-w2h8sw .cursor__tick:where(.svelte-w2h8sw),.cursor[data-form=sort].svelte-w2h8sw .cursor__ring:where(.svelte-w2h8sw),.cursor[data-form=sort].svelte-w2h8sw .cursor__tick:where(.svelte-w2h8sw){opacity:0}.cursor__label.svelte-w2h8sw{white-space:nowrap;color:var(--mark);border-bottom:1px solid var(--mark);animation:svelte-w2h8sw-label-in .3s var(--ease-out-expo) both;padding:3px 0 4px;position:absolute;top:0;left:0}.cursor[data-form=pixel].svelte-w2h8sw .cursor__label:where(.svelte-w2h8sw){border:1px solid var(--mark);padding:5px 8px 4px}.cursor__label.svelte-w2h8sw:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)){animation-name:svelte-w2h8sw-label-in-rtl}@keyframes svelte-w2h8sw-label-in{0%{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0)}}@keyframes svelte-w2h8sw-label-in-rtl{0%{opacity:0;clip-path:inset(0 0 0 100%)}to{opacity:1;clip-path:inset(0)}}
+
+.language.svelte-1a959v9{position:relative}.language__sheet.svelte-1a959v9{z-index:10;pointer-events:none;min-width:13.5rem;max-width:calc(100vw - 2rem);transition:display .7s allow-discrete;gap:.55rem;padding:.75rem 0 0;display:none;position:absolute;inset-block-start:calc(100% + .9rem);inset-inline-start:-.08em}.language[data-open].svelte-1a959v9 .language__sheet:where(.svelte-1a959v9){display:grid}.language[data-align=end].svelte-1a959v9 .language__sheet:where(.svelte-1a959v9){inset-inline:auto -.08em}.language[data-open].svelte-1a959v9 .language__sheet:where(.svelte-1a959v9){pointer-events:auto}.language__rule.svelte-1a959v9{background:var(--rule);transform-origin:0;height:1px;transition:scale .3s var(--ease-swift), background-color var(--duration-world) var(--ease-in-out-quart);position:absolute;inset:0 0 auto;scale:0 1}.language__rule.svelte-1a959v9:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)){transform-origin:100%}.language[data-open].svelte-1a959v9 .language__rule:where(.svelte-1a959v9){transition:scale .9s var(--ease-out-expo), background-color var(--duration-world) var(--ease-in-out-quart);scale:1}@starting-style{.language[data-open].svelte-1a959v9 .language__rule:where(.svelte-1a959v9){scale:0 1}.language[data-open].svelte-1a959v9 .language__item:where(.svelte-1a959v9){opacity:0;translate:0 6px}}.language__list.svelte-1a959v9{gap:.15rem;margin:0;padding:0;list-style:none;display:grid}.language__item.svelte-1a959v9{opacity:0;transition:opacity .22s var(--ease-out-quint), translate .3s var(--ease-out-expo);translate:0 6px}.language[data-open].svelte-1a959v9 .language__item:where(.svelte-1a959v9){opacity:1;transition:opacity .7s var(--ease-out-quint) calc(.14s + var(--order) * 55ms), translate .9s var(--ease-out-expo) calc(.14s + var(--order) * 55ms);translate:0}.language__link.svelte-1a959v9{--tone:color-mix(in oklab, var(--ink-soft), var(--ink) calc(var(--hover,0) * 100%));color:var(--tone);transition:color .16s var(--ease-swift);grid-template-columns:.5rem auto 1fr auto;align-items:baseline;column-gap:.6rem;padding:.32rem 0;text-decoration:none;display:grid}.language__link.svelte-1a959v9:hover,.language__link.svelte-1a959v9:focus-visible,.language__link[aria-current].svelte-1a959v9{color:var(--ink)}.language__ring.svelte-1a959v9{border:1px solid;border-radius:50%;align-self:center;width:.42rem;height:.42rem}.language__link[aria-current].svelte-1a959v9 .language__ring:where(.svelte-1a959v9){background:currentColor}.language__name.svelte-1a959v9{font-family:var(--font-endonym,var(--font-sans));white-space:nowrap;font-size:.9375rem;line-height:1.2}.language__variety.svelte-1a959v9{font-family:var(--font-endonym,var(--font-sans));color:var(--ink-faint);white-space:nowrap;font-size:.8125rem}.language__code.svelte-1a959v9{color:var(--ink-faint);grid-column:4}.language__link.svelte-1a959v9:is(:where(.svelte-1a959v9):lang(fa),:where(.svelte-1a959v9):lang(ckb)) :is(.language__name:where(.svelte-1a959v9),.language__variety:where(.svelte-1a959v9)){font-size:1.0625rem;line-height:1.35}@media (prefers-reduced-motion:reduce){.language__sheet.svelte-1a959v9,.language__item.svelte-1a959v9,.language__rule.svelte-1a959v9{transition:none}}.control-key.svelte-yqr5eo{--size:2.25rem;width:var(--size);height:var(--size);color:inherit;cursor:inherit;opacity:0;rotate:-8deg;scale:calc(1 - var(--hover,0) * .06);background:0 0;border:0;border-radius:50%;padding:0;display:block}.control-key--compact.svelte-yqr5eo{--size:2rem}.control-key--small.svelte-yqr5eo{--size:1.8rem;margin-block:-.6rem}.control-key.svelte-yqr5eo img:where(.svelte-yqr5eo){mix-blend-mode:multiply;filter:grayscale();width:100%;height:100%;transition:filter 1.4s var(--ease-out-quint);display:block}:root[data-impression] .control-key.svelte-yqr5eo img:where(.svelte-yqr5eo){filter:grayscale(0)}:root[data-world=void] .control-key.svelte-yqr5eo img:where(.svelte-yqr5eo){mix-blend-mode:normal;filter:grayscale()brightness(2.4)saturate(1.05)}:root[data-world=void][data-impression] .control-key.svelte-yqr5eo img:where(.svelte-yqr5eo){filter:grayscale(0)brightness(1.35)saturate(1.05)}.control-key--in.svelte-yqr5eo{opacity:1;animation:.52s cubic-bezier(.2,1.6,.4,1) .76s both svelte-yqr5eo-strike}@keyframes svelte-yqr5eo-strike{0%{opacity:0;transform:scale(1.35)}to{opacity:1;transform:none}}.control-key.svelte-yqr5eo:focus-visible{outline:1px solid var(--signal);outline-offset:4px}@media (prefers-reduced-motion:reduce){.control-key--in.svelte-yqr5eo{animation:none}}.controls.svelte-yj601m{align-items:center;gap:1.35rem;display:flex}@media (width<=560px){.controls.svelte-yj601m{gap:.9rem}}
+
+.mat.svelte-vue9m0{--mat-band:calc(var(--page-mat,2.25rem) * var(--mount,0) * var(--presence,1));--lock:11px;z-index:45;pointer-events:none;position:fixed;inset:0}.mat[data-contained].svelte-vue9m0{z-index:0;position:absolute}.mat__furniture.svelte-vue9m0,.mat__edge.svelte-vue9m0,.mat__lock.svelte-vue9m0,.mat__slug.svelte-vue9m0{position:absolute}.mat__furniture.svelte-vue9m0{background:var(--hatch-pattern), var(--ground,var(--surface));transition:background-color var(--duration-world) var(--ease-in-out-quart);background-attachment:fixed,scroll}.mat__furniture[data-side=top].svelte-vue9m0{height:var(--mat-band);inset:0 0 auto}.mat__furniture[data-side=bottom].svelte-vue9m0{height:var(--mat-band);inset:auto 0 0}.mat__furniture[data-side=start].svelte-vue9m0,.mat__furniture[data-side=end].svelte-vue9m0{top:var(--mat-band);bottom:var(--mat-band);width:var(--mat-band)}.mat__furniture[data-side=start].svelte-vue9m0{inset-inline-start:0}.mat__furniture[data-side=end].svelte-vue9m0{inset-inline-end:0}.mat__edge.svelte-vue9m0{inset:var(--mat-band);border:1px solid var(--hatch-edge);opacity:calc(var(--mount,0) * var(--presence,1))}.mat__lock.svelte-vue9m0{width:var(--lock);height:var(--lock);opacity:calc(var(--mount,0) * var(--presence,1));translate:-50% -50%}.mat__lock.svelte-vue9m0:before,.mat__lock.svelte-vue9m0:after{content:"";background:var(--ink);position:absolute}.mat__lock.svelte-vue9m0:before{inset-inline:0;height:1px;top:calc(50% - .5px)}.mat__lock.svelte-vue9m0:after{inset-block:0;width:1px;left:calc(50% - .5px)}.mat__lock[data-corner^=top].svelte-vue9m0{top:var(--mat-band)}.mat__lock[data-corner^=bottom].svelte-vue9m0{top:calc(100% - var(--mat-band))}.mat__lock[data-corner$=start].svelte-vue9m0{left:var(--mat-band)}.mat__lock[data-corner$=end].svelte-vue9m0,.mat.svelte-vue9m0:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)) .mat__lock[data-corner$=start]:where(.svelte-vue9m0){left:calc(100% - var(--mat-band))}.mat.svelte-vue9m0:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)) .mat__lock[data-corner$=end]:where(.svelte-vue9m0){left:var(--mat-band)}.mat__slug.svelte-vue9m0{inset-inline-end:calc(var(--mat-band) + 1.5rem);bottom:calc(var(--mat-band) / 2);background:var(--ground,var(--surface));color:var(--ink-soft);white-space:nowrap;opacity:calc(var(--mount,0) * var(--presence,1));transition:background-color var(--duration-world) var(--ease-in-out-quart);padding-inline:.6em;translate:0 50%}@media (width<=760px){.mat.svelte-vue9m0{display:none}}
+
+.lens__unavailable.svelte-asx0yf{text-align:center;max-width:24ch;color:var(--ink-soft);font-size:.8rem;position:absolute;top:52%;left:50%;translate:-50% -50%}.lens.svelte-asx0yf{image-rendering:auto;opacity:0;width:100%;height:100%;transition:opacity 1.2s var(--ease-out-expo);display:block;position:absolute;inset:0}.lens.svelte-asx0yf:not(.lens--failed){opacity:1}.lens[data-mirrored].svelte-asx0yf{scale:-1 1}.lens[data-hidden].svelte-asx0yf{visibility:hidden}.passage.svelte-n7npvj{pointer-events:none;visibility:hidden;width:100%;height:100%;display:block;position:absolute;inset:0}.passage[data-shown].svelte-n7npvj{visibility:visible}
+
+.bridge.svelte-526mtw{width:2.6em;height:1.3em;fill:var(--ink);flex:none}
+
+.lexicon.svelte-ril3c4{pointer-events:auto;border-top-color:#0000;width:100%;position:relative}.lexicon__rule.svelte-ril3c4{background:var(--rule);transform-origin:0;height:1px;transition:scale .42s var(--ease-out-quint), background-color var(--duration-world) var(--ease-in-out-quart);display:block;position:absolute;inset:-1px 0 auto;scale:0 1}.lexicon__rule.svelte-ril3c4:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)){transform-origin:100%}.lexicon--in.svelte-ril3c4 .lexicon__rule:where(.svelte-ril3c4){transition:scale 1.1s var(--ease-out-expo), background-color var(--duration-world) var(--ease-in-out-quart);scale:1}.lexicon__head.svelte-ril3c4,.lexicon__root.svelte-ril3c4,.lexicon__sense.svelte-ril3c4{opacity:0;transition:opacity .32s var(--ease-out-quint), translate .42s var(--ease-out-expo);translate:0 6px}.lexicon__head.svelte-ril3c4{--delay:.18s}.lexicon__root.svelte-ril3c4{--delay:calc(.3s + var(--order) * 90ms)}.lexicon__sense.svelte-ril3c4{--delay:.52s}.lexicon--in.svelte-ril3c4 :is(.lexicon__head:where(.svelte-ril3c4),.lexicon__root:where(.svelte-ril3c4),.lexicon__sense:where(.svelte-ril3c4)){opacity:1;transition:opacity .8s var(--ease-out-quint) var(--delay), translate 1s var(--ease-out-expo) var(--delay);translate:0}.lexicon__head.svelte-ril3c4{align-items:baseline;gap:.7rem;display:flex}.lexicon__word.svelte-ril3c4{font-family:var(--font-cast);word-spacing:var(--font-cast--word-spacing,normal);font-size:var(--lexicon-word,clamp(1.75rem, 2.3vw, 2.25rem));letter-spacing:calc(.005em * var(--tracking,1));padding-top:.14em;line-height:.9}.lexicon__say.svelte-ril3c4{font-family:var(--font-serif);font-style:var(--italic,italic);color:var(--ink-soft);transition:color var(--duration-world) var(--ease-in-out-quart);font-size:.9375rem}.lexicon__grammar.svelte-ril3c4{color:var(--ink-faint);margin-inline-start:auto;font-variant-caps:normal}.lexicon__roots.svelte-ril3c4{gap:.25rem;margin:.6rem 0 0;display:grid}.lexicon__root.svelte-ril3c4{grid-template-columns:2.75rem 1fr;align-items:baseline;display:grid}.lexicon__term.svelte-ril3c4{font-family:var(--font-mono);letter-spacing:calc(.06em * var(--tracking,1));font-size:.6875rem;font-weight:500}.lexicon__gloss.svelte-ril3c4{font-family:var(--font-serif);font-style:var(--italic,italic);font-size:var(--text-note);margin:0;line-height:1.15}.lexicon__sense.svelte-ril3c4{border-top:1px solid var(--rule-soft);font-family:var(--font-serif);text-wrap:balance;transition:border-color var(--duration-world) var(--ease-in-out-quart);margin-top:.65rem;padding-top:.5rem;font-size:clamp(.98rem,1.1vw,1.0625rem);line-height:1.3}.sense.svelte-ril3c4{max-width:17rem;font-family:var(--font-serif);text-wrap:pretty;pointer-events:auto;opacity:0;transition:opacity .32s var(--ease-out-quint), translate .42s var(--ease-out-expo);margin:0;font-size:.9375rem;line-height:1.32;translate:0 6px}.sense--in.svelte-ril3c4{opacity:1;transition:opacity .8s var(--ease-out-quint) .18s, translate 1s var(--ease-out-expo) .18s;translate:0}.sense__word.svelte-ril3c4{font-family:var(--font-cast);word-spacing:var(--font-cast--word-spacing,normal);letter-spacing:calc(.02em * var(--tracking,1));margin-inline-end:.3em;font-size:1.0625rem}.sense__grammar.svelte-ril3c4{font-style:var(--italic,italic);margin-inline-end:.2em}
+
+.bio.svelte-n1l0ts{pointer-events:auto;border-top-color:#0000;width:100%;position:relative}.bio__rule.svelte-n1l0ts{background:var(--rule);transform-origin:0;height:1px;transition:scale .42s var(--ease-out-quint), background-color var(--duration-world) var(--ease-in-out-quart);display:block;position:absolute;inset:-1px 0 auto;scale:0 1}.bio__rule.svelte-n1l0ts:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)){transform-origin:100%}.bio--in.svelte-n1l0ts .bio__rule:where(.svelte-n1l0ts){transition:scale 1.1s var(--ease-out-expo) .12s, background-color var(--duration-world) var(--ease-in-out-quart);scale:1}.record__head.svelte-n1l0ts,.bio__body.svelte-n1l0ts{opacity:0;transition:opacity .32s var(--ease-out-quint), translate .42s var(--ease-out-expo), color var(--duration-world) var(--ease-in-out-quart);margin:0;translate:0 6px}.record__head.svelte-n1l0ts{--delay:.32s}.bio__body.svelte-n1l0ts{--delay:.44s;font-family:var(--font-serif);font-size:var(--text-prose);line-height:var(--text-prose--line-height);color:var(--ink-soft);text-wrap:pretty;hanging-punctuation:first;margin-top:.55rem}.bio--in.svelte-n1l0ts :is(.record__head:where(.svelte-n1l0ts),.bio__body:where(.svelte-n1l0ts)){opacity:1;transition:opacity .8s var(--ease-out-quint) var(--delay), translate 1s var(--ease-out-expo) var(--delay), color var(--duration-world) var(--ease-in-out-quart);translate:0}
+
+.pager.svelte-1c0ri6p{justify-items:center;gap:.45rem;display:grid}.pager[data-align=start].svelte-1c0ri6p{justify-items:start}.pager__name.svelte-1c0ri6p{font-family:var(--font-serif);font-style:var(--italic,italic);font-size:var(--text-note);white-space:nowrap;margin:0;line-height:1.1}.pager__detail.svelte-1c0ri6p{color:var(--ink-faint);vertical-align:.15em;margin-inline-end:.7em;font-style:normal}.pager[data-align=start].svelte-1c0ri6p .pager__name:where(.svelte-1c0ri6p){padding-inline-start:calc(var(--index-at) * var(--window) - .6em)}.barrel.svelte-1c0ri6p{width:var(--window);touch-action:pan-y;height:32px;cursor:inherit;-webkit-tap-highlight-color:transparent;padding:0;display:block;position:relative}.barrel__window.svelte-1c0ri6p{-webkit-mask-image:linear-gradient(to right, transparent, #000 calc(var(--index-at) * 100% - 26%), #000 calc(var(--index-at) * 100% + 26%), transparent calc(var(--index-at) * 100% + 50%));mask-image:linear-gradient(to right, transparent, #000 calc(var(--index-at) * 100% - 26%), #000 calc(var(--index-at) * 100% + 26%), transparent calc(var(--index-at) * 100% + 50%));position:absolute;inset:0;overflow:hidden}.barrel__window.svelte-1c0ri6p:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)){-webkit-mask-image:linear-gradient(to left, transparent, #000 calc(var(--index-at) * 100% - 26%), #000 calc(var(--index-at) * 100% + 26%), transparent calc(var(--index-at) * 100% + 50%));mask-image:linear-gradient(to left, transparent, #000 calc(var(--index-at) * 100% - 26%), #000 calc(var(--index-at) * 100% + 26%), transparent calc(var(--index-at) * 100% + 50%))}.pager[data-align=start].svelte-1c0ri6p .barrel__window:where(.svelte-1c0ri6p){-webkit-mask-image:linear-gradient(90deg,#0000,#000 4% 46%,#0000 92%);mask-image:linear-gradient(90deg,#0000,#000 4% 46%,#0000 92%)}.pager[data-align=start].svelte-1c0ri6p .barrel__window:where(.svelte-1c0ri6p):is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)){-webkit-mask-image:linear-gradient(270deg,#0000,#000 4% 46%,#0000 92%);mask-image:linear-gradient(270deg,#0000,#000 4% 46%,#0000 92%)}.barrel__scale.svelte-1c0ri6p{translate:calc(var(--hover,0) * -7px * var(--travel,1)) 0;display:block;overflow:visible}.barrel__engraving.svelte-1c0ri6p{transition:transform .9s var(--ease-in-out-quart)}.barrel--holding.svelte-1c0ri6p .barrel__engraving:where(.svelte-1c0ri6p){transition:none}.barrel__ticks.svelte-1c0ri6p{fill:none;stroke:var(--ink);stroke-width:1px;vector-effect:non-scaling-stroke;transition:stroke var(--duration-world) var(--ease-in-out-quart)}.barrel__figure.svelte-1c0ri6p{fill:var(--ink-faint);font-family:var(--font-mono);font-size:var(--text-micro);letter-spacing:calc(.06em * var(--tracking,1));text-anchor:middle;transition:fill .6s var(--ease-out-quint)}.barrel__figure--at.svelte-1c0ri6p{fill:var(--ink)}.barrel__index.svelte-1c0ri6p{inset-inline-start:calc(var(--index-at) * 100%);background:var(--ink);width:1px;height:17px;transition:background-color var(--duration-world) var(--ease-in-out-quart);position:absolute;top:-5px;translate:-.5px}.barrel__index.svelte-1c0ri6p:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)){translate:.5px}.barrel__index.svelte-1c0ri6p:after{content:"";border:3.5px solid #0000;border-top-color:var(--ink);position:absolute;top:-1px;left:-3px}.barrel.svelte-1c0ri6p:focus-visible{outline-offset:6px}.sr-only.svelte-1c0ri6p{clip-path:inset(50%);white-space:nowrap;width:1px;height:1px;position:absolute;overflow:hidden}@media (prefers-reduced-motion:reduce){.barrel__engraving.svelte-1c0ri6p{transition:none}.barrel__scale.svelte-1c0ri6p{translate:none}}
+
+.glyphs.svelte-1o89jvp{pointer-events:none;color:var(--excite);contain:layout paint;position:absolute;inset:0;overflow:hidden}.glyph.svelte-1o89jvp{will-change:transform;--stem:0;--mark:0;--draw:0;--caption:0;--float:0px;--x:0px;--y:0px;width:0;height:0;position:absolute;top:0;left:0}.glyph[data-shown=false].svelte-1o89jvp{display:none}.glyph__leader.svelte-1o89jvp{position:absolute;top:0;left:0;overflow:visible}.glyph__leader.svelte-1o89jvp path:where(.svelte-1o89jvp){fill:none;stroke:currentColor;stroke-width:1px;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:calc(1 - var(--stem));vector-effect:non-scaling-stroke}.glyph__mark.svelte-1o89jvp{fill:var(--surface);stroke:currentColor;stroke-width:1px;transform:scale(var(--mark));transform-box:fill-box;transform-origin:50%;vector-effect:non-scaling-stroke}.glyph__form.svelte-1o89jvp{translate:calc(var(--x) - 13px) calc(var(--y) - 26px + var(--float));opacity:min(1, calc(var(--draw) * 3));justify-items:center;gap:6px;display:grid;position:absolute;top:0;left:0}.glyph__drawing.svelte-1o89jvp{scale:calc(.86 + var(--draw) * .14);display:block;overflow:visible}.glyph__drawing.svelte-1o89jvp path:where(.svelte-1o89jvp){fill:none;stroke:currentColor;stroke-width:1.25px;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:clamp(0, calc(1 - (var(--draw) - var(--order) * .45) / .55), 1)}.glyph__drawing.svelte-1o89jvp circle:where(.svelte-1o89jvp){fill:currentColor;opacity:var(--draw)}.glyph__caption.svelte-1o89jvp{white-space:nowrap;opacity:var(--caption);translate:calc((1 - var(--caption)) * -3px) -50%;gap:.6em;font-size:8.5px;display:flex;position:absolute;top:50%;left:calc(100% + 7px)}.glyph__index.svelte-1o89jvp{opacity:.55}html[data-world=void] .glyph__form.svelte-1o89jvp{filter:drop-shadow(0 0 5px color-mix(in oklab, var(--excite) 55%, transparent))}@media (width<=560px){.glyph__caption.svelte-1o89jvp{display:none}}
+</style>
+		<link href="./_app/immutable/assets/0.BKYO75sU.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/CursorLayer.BlC1IwfB.css" rel="stylesheet" disabled media="(max-width: 0)">
+		<link href="./_app/immutable/assets/tint.Zd1uaEST.css" rel="stylesheet" disabled media="(max-width: 0)">
+		<link href="./_app/immutable/assets/Mat.CIZz60ig.css" rel="stylesheet" disabled media="(max-width: 0)">
+		<link href="./_app/immutable/assets/LensCanvas.D7wSTkTS.css" rel="stylesheet" disabled media="(max-width: 0)">
+		<link href="./_app/immutable/assets/Bridge.BbzlXSuh.css" rel="stylesheet" disabled media="(max-width: 0)">
+		<link href="./_app/immutable/assets/3.DWNPo0PO.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/Lexicon.DRY4_2nd.css" rel="stylesheet" disabled media="(max-width: 0)">
+		<link href="./_app/immutable/assets/BioCard.DSGKA6sx.css" rel="stylesheet" disabled media="(max-width: 0)">
+		<link href="./_app/immutable/assets/Barrel.CqwFNHby.css" rel="stylesheet" disabled media="(max-width: 0)">
+		<link href="./_app/immutable/assets/MeadowGlyphs.Bdudha3B.css" rel="stylesheet" disabled media="(max-width: 0)">
+			<link rel="preload" href="/generated/fonts/sans-latin.f05ca5afedae5cb4.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+		<link rel="preload" href="/generated/fonts/mono-latin.8145f01e1dbe866e.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+		<link rel="preload" href="/generated/fonts/cast-latin.14ddc9e0f1d48d70.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+		<link rel="preload" href="/generated/fonts/serif-display-latin.cfff91fcbc3aa03f.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+		<link rel="preload" href="/generated/fonts/sans-arabic.fa.640578f83522ff11.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+		<link rel="preload" href="/generated/fonts/mono-arabic.fa.6a762fa734ca93ca.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+		<link rel="preload" href="/generated/fonts/note-arabic.fa.8b59020311e926aa.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+		<link rel="preload" href="/generated/fonts/cast-arabic.fa.d8314fdce8ea834d.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+		<link rel="preload" href="/generated/fonts/serif-display-arabic.fa.3fc43d70da78e437.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+		<style id="birkar-faces">@font-face {
+	font-family: 'Dana Fallback';
+	src: local('Tahoma'), local('Geeza Pro'), local('Noto Sans Arabic'), local('Segoe UI');
+	size-adjust: 96.79%;
+	ascent-override: 109.08%;
+	descent-override: 46.91%;
+	line-gap-override: 0.00%;
+	unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200D;
+}
+/* sans-arabic.fa: fa */
+@font-face {
+	font-family: 'Dana FA';
+	font-style: normal;
+	font-weight: 400 700;
+	size-adjust: 105.58%;
+	font-display: swap;
+	unicode-range: U+0020-0021, U+0025, U+0028-002B, U+002D-002F, U+003A, U+003D, U+005B, U+005D, U+00AB, U+00B0, U+00BB, U+00D7, U+060C, U+061B, U+061F, U+0621-0624, U+0626-063A, U+0640-0642, U+0644-0648, U+064B-0652, U+0654, U+066A-066C, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06C0, U+06CC, U+06F0-06F9, U+200C-200D, U+2026, U+2032-2033;
+	src: url('/generated/fonts/sans-arabic.fa.640578f83522ff11.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Pofak Measure Fallback';
+	src: local('Tahoma'), local('Geeza Pro'), local('Noto Sans Arabic'), local('Segoe UI');
+	size-adjust: 74.79%;
+	ascent-override: 148.86%;
+	descent-override: 75.72%;
+	line-gap-override: 0.00%;
+	unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200D;
+}
+/* mono-arabic.fa: fa */
+@font-face {
+	font-family: 'Pofak Measure FA';
+	font-style: normal;
+	font-weight: 400 560;
+	size-adjust: 95.98%;
+	font-display: swap;
+	unicode-range: U+0020-0021, U+0025, U+0028-002B, U+002D-002F, U+003A, U+003D, U+005B, U+005D, U+00AB, U+00B0, U+00BB, U+00D7, U+060C, U+061B, U+061F, U+0621-0624, U+0626-063A, U+0640-0642, U+0644-0648, U+064B-0652, U+0654, U+066A-066C, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06C0, U+06CC, U+06F0-06F9, U+200C-200D, U+2026, U+2032-2033;
+	src: url('/generated/fonts/mono-arabic.fa.6a762fa734ca93ca.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Pofak Note Fallback';
+	src: local('Tahoma'), local('Geeza Pro'), local('Noto Sans Arabic'), local('Segoe UI');
+	size-adjust: 62.16%;
+	ascent-override: 148.86%;
+	descent-override: 75.72%;
+	line-gap-override: 0.00%;
+	unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200D;
+}
+/* note-arabic.fa: fa */
+@font-face {
+	font-family: 'Pofak Note FA';
+	font-style: normal;
+	font-weight: 400;
+	size-adjust: 79.77%;
+	font-display: swap;
+	unicode-range: U+0020-0021, U+0025, U+0028-002B, U+002D-002F, U+003A, U+003D, U+005B, U+005D, U+00AB, U+00B0, U+00BB, U+00D7, U+060C, U+061B, U+061F, U+0621-0624, U+0626-063A, U+0640-0642, U+0644-0648, U+064B-0652, U+0654, U+066A-066C, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06C0, U+06CC, U+06F0-06F9, U+200C-200D, U+2026, U+2032-2033;
+	src: url('/generated/fonts/note-arabic.fa.8b59020311e926aa.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Gofteh Cast Fallback';
+	src: local('Tahoma'), local('Geeza Pro'), local('Noto Sans Arabic'), local('Segoe UI');
+	size-adjust: 93.44%;
+	ascent-override: 91.63%;
+	descent-override: 39.27%;
+	line-gap-override: 0.00%;
+	unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200D;
+}
+/* cast-arabic.fa: fa */
+@font-face {
+	font-family: 'Gofteh Cast FA';
+	font-style: normal;
+	font-weight: 1000;
+	size-adjust: 101.93%;
+	ascent-override: 84%;
+	descent-override: 36%;
+	line-gap-override: 0%;
+	font-display: swap;
+	unicode-range: U+0020-0021, U+0025, U+0028-002B, U+002D-002F, U+003A, U+003D, U+005B, U+005D, U+00AB, U+00B0, U+00BB, U+00D7, U+060C, U+061B, U+061F, U+0621-0624, U+0626-063A, U+0640-0642, U+0644-0648, U+064B-0652, U+0654, U+066A-066C, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06CC, U+06F0-06F9, U+200C-200D, U+2013-2014;
+	src: url('/generated/fonts/cast-arabic.fa.d8314fdce8ea834d.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Gofteh Text Fallback';
+	src: local('Tahoma'), local('Geeza Pro'), local('Noto Sans Arabic'), local('Segoe UI');
+	size-adjust: 87.01%;
+	ascent-override: 91.63%;
+	descent-override: 39.27%;
+	line-gap-override: 0.00%;
+	unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200D;
+}
+/* serif-arabic.fa: fa */
+@font-face {
+	font-family: 'Gofteh Text FA';
+	font-style: normal;
+	font-weight: 380;
+	size-adjust: 94.91%;
+	ascent-override: 84%;
+	descent-override: 36%;
+	line-gap-override: 0%;
+	font-display: swap;
+	unicode-range: U+0020-0021, U+0025, U+0028-002B, U+002D-002F, U+003A, U+003D, U+005B, U+005D, U+00AB, U+00B0, U+00BB, U+00D7, U+060C, U+061B, U+061F, U+0621-0624, U+0626-063A, U+0640-0642, U+0644-0648, U+064B-0652, U+0654, U+066A-066C, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06CC, U+06F0-06F9, U+200C-200D, U+2013-2014;
+	src: url('/generated/fonts/serif-arabic.fa.33b4cc2c668ebe5b.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Elize Fallback';
+	src: local('Tahoma'), local('Geeza Pro'), local('Noto Sans Arabic'), local('Segoe UI');
+	size-adjust: 0.00%;
+	ascent-override: Infinity%;
+	descent-override: Infinity%;
+	line-gap-override: Infinity%;
+	unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200D;
+}
+/* serif-display-arabic.fa: fa */
+@font-face {
+	font-family: 'Elize FA';
+	font-style: normal;
+	font-weight: 400;
+	size-adjust: 95.61%;
+	ascent-override: 100%;
+	descent-override: 20%;
+	line-gap-override: 20%;
+	font-display: swap;
+	unicode-range: U+0020-0021, U+0028-002B, U+002D-002F, U+003D, U+005B, U+005D, U+00AB, U+00BB, U+00D7, U+060C, U+061B, U+061F, U+0621-0624, U+0626-063A, U+0640-0642, U+0644-0648, U+064B-0652, U+0654, U+066A-066C, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06C0, U+06CC, U+06F0-06F9, U+200C-200D;
+	src: url('/generated/fonts/serif-display-arabic.fa.3fc43d70da78e437.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Gofteh Display Fallback';
+	src: local('Tahoma'), local('Geeza Pro'), local('Noto Sans Arabic'), local('Segoe UI');
+	size-adjust: 108.62%;
+	ascent-override: 91.63%;
+	descent-override: 39.27%;
+	line-gap-override: 0.00%;
+	unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200D;
+}
+/* display-arabic.fa: fa */
+@font-face {
+	font-family: 'Gofteh Display FA';
+	font-style: normal;
+	font-weight: 300;
+	size-adjust: 118.48%;
+	ascent-override: 84%;
+	descent-override: 36%;
+	line-gap-override: 0%;
+	font-display: swap;
+	unicode-range: U+0020-0021, U+0025, U+0028-002B, U+002D-002F, U+003A, U+003D, U+005B, U+005D, U+00AB, U+00B0, U+00BB, U+00D7, U+060C, U+061B, U+061F, U+0621-0624, U+0626-063A, U+0640-0642, U+0644-0648, U+064B-0652, U+0654, U+066A-066C, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06CC, U+06F0-06F9, U+200C-200D, U+2013-2014;
+	src: url('/generated/fonts/display-arabic.fa.a686e624a1c4a1c5.woff2') format('woff2');
+}
+[lang|='fa'] {
+	--font-sans: 'Dana FA', 'Dana Fallback', 'Geist', 'Geist Fallback', ui-sans-serif, -apple-system, Segoe UI, Helvetica Neue, Arial, sans-serif;
+	--font-mono: 'Pofak Measure FA', 'Pofak Measure Fallback', 'Geist Mono', 'Geist Mono Fallback', ui-monospace, SF Mono, Roboto Mono, monospace;
+	--font-note: 'Pofak Note FA', 'Pofak Note Fallback', 'Newsreader', 'Newsreader Fallback', ui-serif, Georgia, Times New Roman, serif;
+	--font-cast: 'Gofteh Cast FA', 'Gofteh Cast Fallback', 'Archivo Cast', 'Archivo Cast Fallback', Impact, Arial Narrow, ui-sans-serif, sans-serif;
+	--font-serif: 'Gofteh Text FA', 'Gofteh Text Fallback', 'Newsreader', 'Newsreader Fallback', ui-serif, Georgia, Times New Roman, serif;
+	--font-serif-display: 'Elize FA', 'Elize Fallback', 'Newsreader Display', 'Newsreader Display Fallback', ui-serif, Georgia, Times New Roman, serif;
+	--font-display: 'Gofteh Display FA', 'Gofteh Display Fallback', 'Archivo', 'Archivo Fallback', ui-sans-serif, -apple-system, Segoe UI, Arial, sans-serif;
+	--font-sans--ascent: 1.0558;
+	--font-sans--descent: 0.454;
+	--font-sans--cap: 0.6989;
+	--font-sans--x: 0.3922;
+	--font-mono--ascent: 1.1134;
+	--font-mono--descent: 0.5663;
+	--font-mono--cap: 0.6815;
+	--font-mono--x: 0.3922;
+	--font-note--ascent: 0.9253;
+	--font-note--descent: 0.4706;
+	--font-note--cap: 0.5664;
+	--font-note--x: 0.3259;
+	--font-cast--ascent: 0.8562;
+	--font-cast--descent: 0.3669;
+	--font-cast--cap: 0.688;
+	--font-cast--x: 0.5003;
+	--font-serif--ascent: 0.7972;
+	--font-serif--descent: 0.3417;
+	--font-serif--cap: 0.56;
+	--font-serif--x: 0.3568;
+	--font-serif-display--ascent: 0.9561;
+	--font-serif-display--descent: 0.1912;
+	--font-serif-display--cap: 0.5957;
+	--font-serif-display--x: 0.3863;
+	--font-display--ascent: 0.9952;
+	--font-display--descent: 0.4265;
+	--font-display--cap: 0.686;
+	--font-display--x: 0.4285;
+	--font-serif-italic--ascent: 0.7972;
+	--font-serif-italic--descent: 0.3417;
+	--font-serif-italic--cap: 0.56;
+	--font-serif-italic--x: 0.3568;
+	--font-note--word-spacing: 0.029em;
+	--font-cast--word-spacing: 0.098em;
+	--font-serif--word-spacing: 0.106em;
+	--font-serif-display--word-spacing: 0.048em;
+	--font-display--word-spacing: 0.078em;
+}
+[lang|='fa'] {
+	--headline-span: clamp(3.4rem, calc(9.6vw / 0.7366), 14rem);
+	--headline-ink: 0.9023;
+	--headline-fill: 4.3164;
+	--hand-measure: 4.1294;
+	--hand-fill: 4.3015;
+	--headline-foot: 0.2885;
+	--hand-hang: 0.4213em;
+	--hand-foot: 0.2256;
+	--hand-ink: 0.6278;
+	--headline-length: 4.9263;
+	--headline-english: 5.235;
+}
+[lang|='fa'] {
+	--motto-ratio: 0.4074;
+	--motto-hand-ratio: 0.7498;
+	--motto-scale: 1.5666;
+}</style>
+		<title>ساندش — مهندسی، به‌مثابهٔ هنر</title>
+		<meta name="description" content="ساندش (نوید رحیم‌زاده) — مهندس نرم‌افزار، مهندس گرافیک و مدیر هنری، از سقز، استان کُردستان، ایران. مهندسی و هنر، با یک عدسی.">
+		<link rel="canonical" href="https://birkar.me/fa">
+		<link rel="alternate" hreflang="en" href="https://birkar.me">
+		<link rel="alternate" hreflang="fa" href="https://birkar.me/fa">
+		<link rel="alternate" hreflang="ckb" href="https://birkar.me/ckb">
+		<link rel="alternate" hreflang="ku" href="https://birkar.me/kmr">
+		<link rel="alternate" hreflang="fi" href="https://birkar.me/fi">
+		<link rel="alternate" hreflang="x-default" href="https://birkar.me">
+		<link rel="preload" href="/api/sheet/fa" as="fetch" crossorigin="anonymous">
+		<meta property="og:type" content="profile">
+		<meta property="og:site_name" content="birkar.me">
+		<meta property="og:title" content="ساندش — مهندسی، به‌مثابهٔ هنر">
+		<meta property="og:description" content="ساندش (نوید رحیم‌زاده) — مهندس نرم‌افزار، مهندس گرافیک و مدیر هنری، از سقز، استان کُردستان، ایران. مهندسی و هنر، با یک عدسی.">
+		<meta property="og:url" content="https://birkar.me/fa">
+		<meta property="og:image" content="https://birkar.me/og.jpg">
+		<meta property="og:image:type" content="image/jpeg">
+		<meta property="og:image:width" content="2400">
+		<meta property="og:image:height" content="1260">
+		<meta property="og:image:alt" content="سیاه‌چاله‌ای که تقریباً از لبه بر برگه‌ای سفید دیده می‌شود؛ بیرکار بر «Ş»ای چینی ایستاده و با مربعی از شیشه به سوی افقش دست دراز کرده است.">
+		<meta property="og:locale" content="fa_IR">
+		<meta property="og:locale:alternate" content="en_US">
+		<meta property="og:locale:alternate" content="cb_IQ">
+		<meta property="og:locale:alternate" content="ku_TR">
+		<meta property="og:locale:alternate" content="fi_FI">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" content="ساندش — مهندسی، به‌مثابهٔ هنر">
+		<meta name="twitter:description" content="ساندش (نوید رحیم‌زاده) — مهندس نرم‌افزار، مهندس گرافیک و مدیر هنری، از سقز، استان کُردستان، ایران. مهندسی و هنر، با یک عدسی.">
+		<meta name="twitter:image" content="https://birkar.me/og.jpg">
+		<meta name="twitter:image:alt" content="سیاه‌چاله‌ای که تقریباً از لبه بر برگه‌ای سفید دیده می‌شود؛ بیرکار بر «Ş»ای چینی ایستاده و با مربعی از شیشه به سوی افقش دست دراز کرده است.">
+		<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Person","@id":"https://birkar.me/#person","name":"ساندش","alternateName":"نوید رحیم‌زاده","url":"https://birkar.me","jobTitle":["توسعهٔ بازی و کارگردانی هنری","سمت سرور","وب، سمت کاربر","چندسکویی"],"description":"ساندش (نوید رحیم‌زاده) — مهندس نرم‌افزار، مهندس گرافیک و مدیر هنری، از سقز، استان کُردستان، ایران. مهندسی و هنر، با یک عدسی.","knowsAbout":["Unity و Godot با ⁦C#⁩، Blender و Substance 3D. جهان‌هایی برای بازی‌کردن و تماشا — آن بخش از این حرفه که مهندسی در آن، خودِ طراحی است.","Go و Python، هرجا که بار هست. Gin، NestJS، Django و FastAPI بر Postgres، Redis و Mongo. سامانه‌هایی که زیر فشار هم آرام و بی‌حادثه می‌مانند.","Svelte و SvelteKit، React و Next.js. رابط‌هایی ساخته‌شده چون ابزار دقیق: یک حلقهٔ فریم، حرکتی سنجیده، و هیچ آرایه‌ای که خود بخشی از سازه نباشد.","Dart و Flutter. یک کدپایه، آفلاین‌محور، یکسان بر هر نمایشگری که به آن می‌رسد."],"address":{"@type":"PostalAddress","addressLocality":"سقز","addressRegion":"استان کُردستان"},"sameAs":["https://github.com/sandeshmaurya-dev","https://t.me/Innocent_zero737"],"email":"sandeshmaurya2006@gmail.com"},{"@type":"WebSite","@id":"https://birkar.me/#site","url":"https://birkar.me","name":"ساندش","inLanguage":["en","fa","ckb","kmr","fi"],"publisher":{"@id":"https://birkar.me/#person"}},{"@type":"ProfilePage","@id":"https://birkar.me/fa#page","url":"https://birkar.me/fa","name":"ساندش — مهندسی، به‌مثابهٔ هنر","inLanguage":"fa","isPartOf":{"@id":"https://birkar.me/#site"},"about":{"@id":"https://birkar.me/#person"},"mainEntity":{"@id":"https://birkar.me/#person"},"primaryImageOfPage":"https://birkar.me/og.jpg"}]}</script>
+		<script type="application/json" id="birkar-words">{"identity":{"name":"ساندش","legalName":"نوید رحیم‌زاده","wordmark":"ساندش","place":"سقز، استان کُردستان، ایران","coordinates":"⁦۳۶°۱۴′⁩ شمالی ⁦۴۶°۱۶′⁩ شرقی","timeLabel":"سقز","motto":"مهندسی و هنر را باید با یک عدسی دید.","poweredBy":"قدرت‌گرفته از","engine":"هستهٔ کرم‌چاله"},"hero":{"eyebrow":"۰۱ — عدسی","headline":{"cast":"مهنـدسی،","hand":"به‌مثابهٔ هنر."},"plate":"لوح ۲۶"},"objects":{"singularity":{"name":"سیاه‌چاله","folio":"۰۱ — عدسی","hold":{"rest":"نگه دار تا برافروزد","lit":"فشار بده تا سرد شود"},"described":{"rest":"ضربه بزن تا میدان گرانشی آشکار شود، یا نگه دار و سیاه‌چاله را خوراک بده تا برافروزد","lit":"ضربه بزن تا میدان گرانشی پنهان شود، یا فشار بده تا سیاه‌چاله سرد شود"}},"galaxy":{"name":"راه شیری","folio":"۰۱ — عدسی","hold":{"rest":"نگه دار تا نور بخورد","lit":"فشار بده تا رنگ ببازد"},"described":{"rest":"ضربه بزن تا میدان گرانشی آشکار شود، یا نگه دار تا رنگ کهکشان پدیدار شود","lit":"ضربه بزن تا میدان گرانشی پنهان شود، یا فشار بده تا رنگ کهکشان محو شود"}},"meadow":{"name":"جایی برای درنگ","folio":"۰۱ — مرغزار","hold":{"rest":"نگه دار تا روشن شود","lit":"فشار بده تا بیارامد"},"described":{"rest":"ضربه بزن تا پیکره‌های شناور مرغزار رها شوند، یا نگه دار تا فانوسش روشن شود","lit":"ضربه بزن تا پیکره‌های شناور مرغزار رها شوند، یا فشار بده تا مرغزار بیارامد"}}},"welcome":{"folio":"۰۲ — چشم","lines":["خوش آمدی.","تجربه‌ای از بیرکار."]},"lens":{"folio":"۰۳ — سوی دیگر","motto":["مهندسی و هنر را","باید با یک عدسی","دید."],"hand":["مهندسی و هنر را","باید با یک عدسی","دید."],"handTall":["مهندسی","و هنر را","باید","با یک عدسی","دید."],"ring":"نور خمیده از راه می‌رسد"},"greeting":{"lines":[[{"voice":"hand","text":"نام من"},{"voice":"cast","text":"ساندش"},{"voice":"hand","text":"است؛"}],[{"voice":"hand","text":"و من یک"},{"voice":"cast","text":"مهندس"},{"voice":"hand","text":"هستم."}]],"keyword":"مهندس","focusing":"تنظیم کانون","focused":"در کانون"},"etymology":{"title":"بیرکار","written":"ckb","tag":"/۲۶","pronunciation":"بیر·کار","grammar":"کُردی · اسم","parts":[{"term":"بیر","gloss":"اندیشه · یاد · چاه"},{"term":"کار","gloss":"کار · کردار · ساختن"}],"conclusion":["کارِ اندیشه —","در کُردی ریاضی‌دان."]},"fields":[{"title":"توسعهٔ بازی و کارگردانی هنری","note":"Unity و Godot با ⁦C#⁩، Blender و Substance 3D. جهان‌هایی برای بازی‌کردن و تماشا — آن بخش از این حرفه که مهندسی در آن، خودِ طراحی است."},{"title":"سمت سرور","note":"Go و Python، هرجا که بار هست. Gin، NestJS، Django و FastAPI بر Postgres، Redis و Mongo. سامانه‌هایی که زیر فشار هم آرام و بی‌حادثه می‌مانند."},{"title":"وب، سمت کاربر","note":"Svelte و SvelteKit، React و Next.js. رابط‌هایی ساخته‌شده چون ابزار دقیق: یک حلقهٔ فریم، حرکتی سنجیده، و هیچ آرایه‌ای که خود بخشی از سازه نباشد."},{"title":"چندسکویی","note":"Dart و Flutter. یک کدپایه، آفلاین‌محور، یکسان بر هر نمایشگری که به آن می‌رسد."}],"callouts":[{"lines":["جرمی کوچک،","هنوز در مدار."],"label":"پیکر"},{"lines":["نور خمیده","از راه می‌رسد."],"label":"نوار"},{"lines":["هیچ‌چیز از افق","نمی‌گریزد."],"label":"لبه"}],"bio":{"title":"نه یک استودیو — یک نفر","body":"من ساندشم — با نام قانونی نوید رحیم‌زاده — مهندس نرم‌افزار و گرافیک، از سقز، استان کُردستان، ایران. قصدم ساختن محصول نیست؛ اثر می‌سازم: چیزهایی با زبانی از آنِ خود، که به یاد می‌مانند و در لحظه‌هایی دیگر دوباره به آن‌ها بازمی‌گردی. این برگه یکی از آن‌هاست.","links":[{"label":"GITHUB","spoken":"GitHub"},{"label":"TELEGRAM","spoken":"تلگرام"},{"label":"ایمیل","spoken":"ایمیل"}]},"handover":{"folio":"۰۵ — وضوح","label":"بخش پنجم: ساندش، با وضوحی رو به افزایش.","caption":["جهان،","یک‌بار نمونه‌برداری‌شده."],"readout":"نمونه‌برداری در"},"question":{"folio":"۰۶ — یادداشت‌ها","label":"بخش ششم: یادداشت‌ها — صفحه‌ای از نوشته، که با دست جابه‌جا می‌شود.","words":["به","کجا","چنین","شتابان؟"]},"sheet":{"skip":"گذشتن از سیاه‌چاله","opening":{"label":"در حال بارگذاری","site":"SANDESH","meters":"م","work":{"fetching":"دریافت","decoding":"رمزگشایی","compiling":"کامپایل","building":"ساخت","drawing":"ترسیم","printing":"چاپ","entering":"ورود","returning":"بازگشت"},"parts":{"page":"صفحه","fonts":"قلم‌ها","renderer":"موتور نمایش","shader":"شیدرها","frame":"نخستین قاب","objects":"اشیاء","fall":"سقوط","print":"صفحه، برای سقوط","birkar":"بیرکار","field":"میدان","photographs":"عکس‌ها","cursor":"نشانگر"},"received":"دریافت‌شده","megabytes":"مگابایت"},"keys":{"world":{"collapse":"فروریختن","emerge":"برآمدن","nightfall":"شامگاه","daybreak":"سپیده‌دم","cursor":"جهان را دگرگون کن","described":{"collapse":"برگه را فرو بریز — شیء را در خلأ ببین","emerge":"برآمدن — شیء را به کاغذ بازگردان","nightfall":"شامگاه — مرغزار را در مهتاب ببین","daybreak":"سپیده‌دم — مرغزار را در روشنای روز ببین"}},"frame":{"label":"قاب","cursor":"قاب بگیر یا قاب بردار","described":{"framed":"برداشتن قاب از گرد برگه","unframed":"کشیدن قاب به گرد برگه"}},"detail":{"label":"جزئیات","cursor":{"closed":"خواندن مدخل","open":"بازگشت به لوح"},"described":{"closed":"نمایش مدخل: نامش، و این‌که کیست","open":"پنهان کردن مدخل و نمایش یادداشت‌های رصدگر"}},"language":{"label":"زبان","cursor":"به زبانی دیگر بخوان","described":"انتخاب زبانی که برگه به آن خوانده می‌شود","list":"زبان‌ها","current":"در حال خواندن"},"control":{"cursor":{"closed":"راهت را پیدا کن","open":"بستن نقشه"},"described":{"closed":"گشودن نقشهٔ دپارتمان کنترل: همهٔ بخش‌های برگه، و جایی که ایستاده‌ای","open":"بستن نقشهٔ دپارتمان کنترل"}}},"pager":{"next":"شیء بعدی","described":"شیء بعدی — {name}","turn":"بچرخان — {name}"},"fields":{"heading":"زمینه‌های کار","depth":"{percent} درصد"},"time":{"label":"زمان محلی","described":"زمان محلی در {place}"},"bio":{"label":"درباره","cursor":"از آشنایی‌ات خوشحالم"},"lexicon":{"cursor":"بیر · کار","noun":"اسم"},"links":{"email":"سلام کن","elsewhere":"باز کن"},"scroll":"پیمایش"},"structure":{"folio":"۰۴ — بیرکار","label":"شعار، ریخته در حروف سربی: هر حرف یک قطعه، هر سطر تیری از حروف، و سه تیر که در گوشه‌ای بر سه محور فضا به هم می‌رسند، هر کدام با گرانش خودش؛ و پشتشان سه برگه که قالب بر آن‌ها در پلان، نما و برش کشیده شده است. حروف پراکندهٔ نام او کنارش آویخته‌اند. بیرکار بر لبهٔ حرفی از سطر نخست نشسته است. با W، A، S و D یا کلیدهای جهت او را راه ببر، با Shift بدو و با Space بپر — نگه دار تا بلندتر بپرد؛ لبه‌های در دسترس را می‌گیرد و از آن‌ها می‌آویزد، که رو به دیوار بالا می‌رود و رو به بیرون رها می‌کند. G را بزن تا گرانش به سوی سطحی که رو به آن است بچرخد، یا به درون دیواری که از آن آویخته است. روی صفحهٔ لمسی، شستی بگذار و بکش تا راه برود — کشیدنی تند صفحه را پیش می‌برد — و ضربه بزن تا بپرد؛ شست دوم می‌پراندش، نگه‌داشته بلندتر، و کشیده عدسی را می‌چرخاند؛ سه ضربهٔ تند گرانش را می‌چرخاند. در انتهای دور هر تیر رادیویی ایستاده که میان ایستگاه‌ها خش‌خش می‌کند؛ کنار یکی، F یا دکمه را نگه دار تا تنظیمش کنی. سه رادیو، که به ترتیب پیدا شوند، سازه را بیدار می‌کنند.","keys":{"move":"راه رفتن","run":{"off":"ضربه برای دویدن","on":"در حال دویدن · ضربه برای راه رفتن"},"hop":"پرش · گرفتن","gravity":"گرانش","fold":"فهمیدم","open":"کلیدها"},"touch":[["نگه دار، بکش","راه رفتن"],["بیشتر بکش","دویدن"],["ضربه","پرش · گرفتن"],["شست دوم","پرش · نگه دار تا بالاتر"],["شست دوم، کشیده","نگاه"],["ضربه × ۳","گرانش"]],"gravityButton":{"label":"گرانش","name":"چرخاندن گرانش به سوی سطح پیش رو"},"cursor":"نگه دار و بکش تا راه برود","views":{"plan":"پلان","elevation":"نما","section":"برش","beneath":"زیر","between":"در گذار"},"nowhere":"سطحی پیش رو نیست"}}</script>
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents"><!--[--><!--[0--><!--[--><!--[-1--><!--[--><a class="skip-link" href="#the-motto">گذشتن از سیاه‌چاله</a> <!--[0--><div class="opening svelte-10a25qh" data-phase="boot" data-crossing-scope="" role="status" aria-live="polite" aria-label="در حال بارگذاری"><div class="opening__sheet svelte-10a25qh"></div> <span class="opening__meta opening__meta--start mono-micro svelte-10a25qh">SANDESH — لوح ۲۶</span> <span class="opening__meta opening__meta--end mono-micro svelte-10a25qh">تنظیم کانون <b class="opening__reading svelte-10a25qh">۰٫۳۰ م</b></span> <div class="opening__crosses svelte-10a25qh" aria-hidden="true"><!--[--><svg class="opening__cross svelte-10a25qh" viewBox="0 0 13 13" width="13" height="13" style="--x:0.3333333333333333; --y:0.25; --order:5"><path d="M6.5 0v13M0 6.5h13"></path></svg><svg class="opening__cross svelte-10a25qh" viewBox="0 0 13 13" width="13" height="13" style="--x:0.3333333333333333; --y:0.5; --order:2.1"><path d="M6.5 0v13M0 6.5h13"></path></svg><svg class="opening__cross svelte-10a25qh" viewBox="0 0 13 13" width="13" height="13" style="--x:0.3333333333333333; --y:0.75; --order:5.2"><path d="M6.5 0v13M0 6.5h13"></path></svg><svg class="opening__cross svelte-10a25qh" viewBox="0 0 13 13" width="13" height="13" style="--x:0.6666666666666666; --y:0.25; --order:5.1"><path d="M6.5 0v13M0 6.5h13"></path></svg><svg class="opening__cross svelte-10a25qh" viewBox="0 0 13 13" width="13" height="13" style="--x:0.6666666666666666; --y:0.5; --order:2.2"><path d="M6.5 0v13M0 6.5h13"></path></svg><svg class="opening__cross svelte-10a25qh" viewBox="0 0 13 13" width="13" height="13" style="--x:0.6666666666666666; --y:0.75; --order:5.3"><path d="M6.5 0v13M0 6.5h13"></path></svg><!--]--></div> <div class="opening__stage svelte-10a25qh"><div class="opening__focus svelte-10a25qh"><!--[--><p class="opening__greeting opening__fringe opening__fringe--short svelte-10a25qh" aria-hidden="true"><!--[--><span class="opening__line svelte-10a25qh"><!--[--><span class="opening__hand svelte-10a25qh">نام من</span><span class="opening__cast svelte-10a25qh">ساندش</span><span class="opening__hand svelte-10a25qh">است؛</span><!--]--></span><span class="opening__line svelte-10a25qh"><!--[--><span class="opening__hand svelte-10a25qh">و من یک</span><span class="opening__cast svelte-10a25qh">مهندس</span><span class="opening__hand svelte-10a25qh">هستم.</span><!--]--></span><!--]--> <span class="opening__line opening__folios svelte-10a25qh"><!--[--><span class="opening__cast svelte-10a25qh" data-folio="lens">۰۱ — عدسی</span><span class="opening__cast svelte-10a25qh" data-folio="eye">۰۲ — چشم</span><span class="opening__cast svelte-10a25qh" data-folio="other-side">۰۳ — سوی دیگر</span><span class="opening__cast svelte-10a25qh" data-folio="birkar">۰۴ — بیرکار</span><span class="opening__cast svelte-10a25qh" data-folio="resolution">۰۵ — وضوح</span><span class="opening__cast svelte-10a25qh" data-folio="notes">۰۶ — یادداشت‌ها</span><!--]--></span></p><p class="opening__greeting opening__fringe opening__fringe--long svelte-10a25qh" aria-hidden="true"><!--[--><span class="opening__line svelte-10a25qh"><!--[--><span class="opening__hand svelte-10a25qh">نام من</span><span class="opening__cast svelte-10a25qh">ساندش</span><span class="opening__hand svelte-10a25qh">است؛</span><!--]--></span><span class="opening__line svelte-10a25qh"><!--[--><span class="opening__hand svelte-10a25qh">و من یک</span><span class="opening__cast svelte-10a25qh">مهندس</span><span class="opening__hand svelte-10a25qh">هستم.</span><!--]--></span><!--]--> <span class="opening__line opening__folios svelte-10a25qh"><!--[--><span class="opening__cast svelte-10a25qh" data-folio="lens">۰۱ — عدسی</span><span class="opening__cast svelte-10a25qh" data-folio="eye">۰۲ — چشم</span><span class="opening__cast svelte-10a25qh" data-folio="other-side">۰۳ — سوی دیگر</span><span class="opening__cast svelte-10a25qh" data-folio="birkar">۰۴ — بیرکار</span><span class="opening__cast svelte-10a25qh" data-folio="resolution">۰۵ — وضوح</span><span class="opening__cast svelte-10a25qh" data-folio="notes">۰۶ — یادداشت‌ها</span><!--]--></span></p><!--]--> <p class="opening__greeting svelte-10a25qh"><!--[--><span class="opening__line svelte-10a25qh" style="--line:0"><!--[--><!--[-1--><span class="opening__hand svelte-10a25qh">نام من</span><!--]--><!--[-1--><span class="opening__cast svelte-10a25qh">ساندش</span><!--]--><!--[-1--><span class="opening__hand svelte-10a25qh">است؛</span><!--]--><!--]--></span><span class="opening__line svelte-10a25qh" style="--line:1"><!--[--><!--[-1--><span class="opening__hand svelte-10a25qh">و من یک</span><!--]--><!--[0--><span class="opening__cast svelte-10a25qh">مهندس</span><!--]--><!--[-1--><span class="opening__hand svelte-10a25qh">هستم.</span><!--]--><!--]--></span><!--]--> <span class="opening__line opening__folios svelte-10a25qh"><!--[--><span class="opening__cast svelte-10a25qh" data-folio="lens">۰۱ — عدسی</span><span class="opening__cast svelte-10a25qh" data-folio="eye">۰۲ — چشم</span><span class="opening__cast svelte-10a25qh" data-folio="other-side">۰۳ — سوی دیگر</span><span class="opening__cast svelte-10a25qh" data-folio="birkar">۰۴ — بیرکار</span><span class="opening__cast svelte-10a25qh" data-folio="resolution">۰۵ — وضوح</span><span class="opening__cast svelte-10a25qh" data-folio="notes">۰۶ — یادداشت‌ها</span><!--]--></span></p></div> <div class="opening__barrel svelte-10a25qh" aria-hidden="true"><svg class="opening__scale svelte-10a25qh" viewBox="-2 -4 904 34" width="904" height="34"><path class="opening__ticks svelte-10a25qh" d="M0.00 0v5M22.50 0v5M45.00 0v5M67.50 0v5M90.00 0v5M112.50 0v5M135.00 0v5M157.50 0v5M180.00 0v5M202.50 0v5M225.00 0v5M247.50 0v5M270.00 0v5M292.50 0v5M315.00 0v5M337.50 0v5M360.00 0v5M382.50 0v5M405.00 0v5M427.50 0v5M450.00 0v5M472.50 0v5M495.00 0v5M517.50 0v5M540.00 0v5M562.50 0v5M585.00 0v5M607.50 0v5M630.00 0v5M652.50 0v5M675.00 0v5M697.50 0v5M720.00 0v5M742.50 0v5M765.00 0v5M787.50 0v5M810.00 0v5M832.50 0v5M855.00 0v5M877.50 0v5M0.00 0v10M128.57 0v10M225.00 0v10M360.00 0v10M514.29 0v10M630.00 0v10M720.00 0v10M765.00 0v10M810.00 0v10M846.00 0v10M873.00 0v10M900.00 0v10"></path><!--[--><text class="opening__figure svelte-10a25qh" x="0" y="26">.3</text><text class="opening__figure svelte-10a25qh" x="128.5714285714286" y="26">.35</text><text class="opening__figure svelte-10a25qh" x="225" y="26">.4</text><text class="opening__figure svelte-10a25qh" x="360" y="26">.5</text><text class="opening__figure svelte-10a25qh" x="514.2857142857142" y="26">.7</text><text class="opening__figure svelte-10a25qh" x="630" y="26">1</text><text class="opening__figure svelte-10a25qh" x="720" y="26">1.5</text><text class="opening__figure svelte-10a25qh" x="765" y="26">2</text><text class="opening__figure svelte-10a25qh" x="810" y="26">3</text><text class="opening__figure svelte-10a25qh" x="846" y="26">5</text><text class="opening__figure svelte-10a25qh" x="873" y="26">10</text><text class="opening__figure svelte-10a25qh" x="900" y="26">∞</text><!--]--></svg> <span class="opening__index svelte-10a25qh"></span></div></div> <div class="opening__work mono-micro svelte-10a25qh" aria-hidden="true"><!----><span class="opening__line-of-work svelte-10a25qh"><b class="opening__verb svelte-10a25qh">دریافت</b> <!--[0--><span class="opening__part">صفحه</span><!--]--> <!--[-1--><!--]--></span><!----></div> <span class="opening__received mono-micro svelte-10a25qh" aria-hidden="true">دریافت‌شده <b class="opening__bytes svelte-10a25qh">۰٫۰ مگابایت</b></span> <div class="opening__rule" aria-hidden="true"><!--[--><span class="opening__edge svelte-10a25qh"></span><span class="opening__edge svelte-10a25qh"></span><span class="opening__edge svelte-10a25qh"></span><span class="opening__edge svelte-10a25qh"></span><!--]--></div></div><!--]--><!----> <section class="hero svelte-1iqinn" data-sector="lens" data-framed="false" data-object="singularity" data-script="Arab" data-kashida="true" style="--welcome-y: 0px; --cast-rule: 0px; --hand-rule: 0px;"><span id="sector-lens" class="sector-anchor svelte-1iqinn" aria-hidden="true"></span> <span id="sector-eye" class="sector-anchor svelte-1iqinn" aria-hidden="true"></span> <div class="hero__runway svelte-1iqinn" aria-hidden="true"></div> <div class="hero__stage svelte-1iqinn"><div class="hero__scene toolbar-foot svelte-1iqinn"><!--[--><!----><canvas class="lens svelte-asx0yf" aria-hidden="true" data-lens-canvas="" data-artwork="singularity" data-mirrored="true"></canvas><!----> <!--[-1--><!--]--><!--]--> <!----><canvas class="passage svelte-n7npvj" aria-hidden="true"></canvas><!----><!----> <!--[-1--><!--]--></div> <canvas class="hero__infall svelte-1iqinn" aria-hidden="true"></canvas> <button type="button" class="hero__core svelte-1iqinn" data-artwork-control="singularity" aria-pressed="false" aria-label="ضربه بزن تا میدان گرانشی آشکار شود، یا نگه دار و سیاه‌چاله را خوراک بده تا برافروزد" style="transform: translate(0px, 0px) translate(-50%, -50%) scale(0.64); --core-scale: 0.64;"></button> <div class="hero__frame svelte-1iqinn" aria-hidden="true" style="--consume: 0;"><!--[--><i class="hero__trim svelte-1iqinn" data-corner="top-left"></i><i class="hero__trim svelte-1iqinn" data-corner="top-right"></i><i class="hero__trim svelte-1iqinn" data-corner="bottom-left"></i><i class="hero__trim svelte-1iqinn" data-corner="bottom-right"></i><!--]--> <!--[--><i class="hero__register svelte-1iqinn" data-side="top"></i><i class="hero__register svelte-1iqinn" data-side="right"></i><i class="hero__register svelte-1iqinn" data-side="bottom"></i><i class="hero__register svelte-1iqinn" data-side="left"></i><!--]--> <i class="hero__wedge svelte-1iqinn"></i> <span class="hero__slug mono-micro svelte-1iqinn">لوح ۲۶</span></div> <!--[0--><div class="hero__callouts svelte-1iqinn"><!--[--><!--[-1--><!--]--><!--]--></div><!--]--> <div class="hero__grid svelte-1iqinn" style="opacity: 1;"><div class="frame svelte-2frfcq" aria-hidden="true" style="--reveal:0"><!--[--><span class="frame__rule frame__rule--v svelte-2frfcq" style="--at:0.3333333333333333; --order:3; --mask:linear-gradient(to bottom, #000 0%, #000 calc(25.0000% - 13px), transparent calc(25.0000% - 13px), transparent calc(25.0000% + 13px), #000 calc(25.0000% + 13px), #000 calc(25.0000% + 13px), #000 calc(50.0000% - 13px), transparent calc(50.0000% - 13px), transparent calc(50.0000% + 13px), #000 calc(50.0000% + 13px), #000 calc(50.0000% + 13px), #000 calc(75.0000% - 13px), transparent calc(75.0000% - 13px), transparent calc(75.0000% + 13px), #000 calc(75.0000% + 13px), #000 100%)"></span><span class="frame__rule frame__rule--v svelte-2frfcq" style="--at:0.6666666666666666; --order:4; --mask:linear-gradient(to bottom, #000 0%, #000 calc(25.0000% - 13px), transparent calc(25.0000% - 13px), transparent calc(25.0000% + 13px), #000 calc(25.0000% + 13px), #000 calc(25.0000% + 13px), #000 calc(50.0000% - 13px), transparent calc(50.0000% - 13px), transparent calc(50.0000% + 13px), #000 calc(50.0000% + 13px), #000 calc(50.0000% + 13px), #000 calc(75.0000% - 13px), transparent calc(75.0000% - 13px), transparent calc(75.0000% + 13px), #000 calc(75.0000% + 13px), #000 100%)"></span><!--]--> <!--[--><span class="frame__rule frame__rule--h svelte-2frfcq" style="--at:0.25; --order:0; --mask:linear-gradient(to right, #000 0%, #000 calc(33.3333% - 13px), transparent calc(33.3333% - 13px), transparent calc(33.3333% + 13px), #000 calc(33.3333% + 13px), #000 calc(33.3333% + 13px), #000 calc(66.6667% - 13px), transparent calc(66.6667% - 13px), transparent calc(66.6667% + 13px), #000 calc(66.6667% + 13px), #000 100%)"></span><span class="frame__rule frame__rule--h svelte-2frfcq" style="--at:0.5; --order:1; --mask:linear-gradient(to right, #000 0%, #000 calc(33.3333% - 13px), transparent calc(33.3333% - 13px), transparent calc(33.3333% + 13px), #000 calc(33.3333% + 13px), #000 calc(33.3333% + 13px), #000 calc(66.6667% - 13px), transparent calc(66.6667% - 13px), transparent calc(66.6667% + 13px), #000 calc(66.6667% + 13px), #000 100%)"></span><span class="frame__rule frame__rule--h svelte-2frfcq" style="--at:0.75; --order:2; --mask:linear-gradient(to right, #000 0%, #000 calc(33.3333% - 13px), transparent calc(33.3333% - 13px), transparent calc(33.3333% + 13px), #000 calc(33.3333% + 13px), #000 calc(33.3333% + 13px), #000 calc(66.6667% - 13px), transparent calc(66.6667% - 13px), transparent calc(66.6667% + 13px), #000 calc(66.6667% + 13px), #000 100%)"></span><!--]--> <!--[--><!--[--><span class="frame__mark svelte-2frfcq" style="--x:0.3333333333333333; --y:0.25; --order:0"><svg viewBox="0 0 13 13" width="13" height="13" aria-hidden="true" class="svelte-2frfcq"><path d="M6.5 0v13M0 6.5h13"></path></svg></span><span class="frame__mark svelte-2frfcq" style="--x:0.3333333333333333; --y:0.5; --order:1"><svg viewBox="0 0 13 13" width="13" height="13" aria-hidden="true" class="svelte-2frfcq"><path d="M6.5 0v13M0 6.5h13"></path></svg></span><span class="frame__mark svelte-2frfcq" style="--x:0.3333333333333333; --y:0.75; --order:2"><svg viewBox="0 0 13 13" width="13" height="13" aria-hidden="true" class="svelte-2frfcq"><path d="M6.5 0v13M0 6.5h13"></path></svg></span><!--]--><!--[--><span class="frame__mark svelte-2frfcq" style="--x:0.6666666666666666; --y:0.25; --order:1"><svg viewBox="0 0 13 13" width="13" height="13" aria-hidden="true" class="svelte-2frfcq"><path d="M6.5 0v13M0 6.5h13"></path></svg></span><span class="frame__mark svelte-2frfcq" style="--x:0.6666666666666666; --y:0.5; --order:2"><svg viewBox="0 0 13 13" width="13" height="13" aria-hidden="true" class="svelte-2frfcq"><path d="M6.5 0v13M0 6.5h13"></path></svg></span><span class="frame__mark svelte-2frfcq" style="--x:0.6666666666666666; --y:0.75; --order:3"><svg viewBox="0 0 13 13" width="13" height="13" aria-hidden="true" class="svelte-2frfcq"><path d="M6.5 0v13M0 6.5h13"></path></svg></span><!--]--><!--]--></div><!----></div> <h1 class="sr-only svelte-1iqinn">مهندسی، به‌مثابهٔ هنر.</h1> <div class="hero__hud svelte-1iqinn"><header class="hero__top svelte-1iqinn"><div class="hero__mark svelte-1iqinn hero__mark--stacked"><div class="hero__name svelte-1iqinn hero__name--stacked"><div class="svelte-1iqinn"><div class="wordmark svelte-jrdb7r"><p class="wordmark__name svelte-jrdb7r">ساندش</p></div><!----></div> <div class="hero__seal svelte-1iqinn"><button type="button" class="control-key svelte-yqr5eo control-key--compact" data-control-key="" aria-haspopup="dialog" aria-expanded="false" aria-label="گشودن نقشهٔ دپارتمان کنترل: همهٔ بخش‌های برگه، و جایی که ایستاده‌ای"><!--[-1--><!--]--></button><!----></div></div> <p class="hero__folio mono-micro svelte-1iqinn" aria-hidden="true">۰۱ — عدسی</p></div> <div class="hero__control svelte-1iqinn"><div class="controls svelte-yj601m"><!--[-1--><!--]--> <button type="button" class="key" aria-label="برگه را فرو بریز — شیء را در خلأ ببین" aria-pressed="false"><span class="key__state" aria-hidden="true"></span> <span>فروریختن</span></button> <!--[-1--><!--]--> <!--[0--><button type="button" class="key" aria-label="نمایش مدخل: نامش، و این‌که کیست" aria-pressed="false"><span class="key__state" aria-hidden="true"></span> <span>جزئیات</span></button><!--]--> <!--$s1--><div class="language svelte-1a959v9" data-align="start"><button type="button" class="key" aria-expanded="false" aria-controls="languages-s1" aria-label="انتخاب زبانی که برگه به آن خوانده می‌شود — فارسی"><span class="key__state" aria-hidden="true"></span> <span>فارسی</span></button> <div id="languages-s1" class="language__sheet svelte-1a959v9" inert=""><span class="language__rule svelte-1a959v9" aria-hidden="true"></span> <ul class="language__list svelte-1a959v9" aria-label="زبان‌ها"><!--[--><li class="language__item svelte-1a959v9" style="--order:0"><a class="language__link svelte-1a959v9" href="/" hreflang="en" lang="en" dir="ltr" tabindex="-1" data-sveltekit-noscroll="true" data-sveltekit-keepfocus="true"><span class="language__ring svelte-1a959v9" aria-hidden="true"></span> <span class="language__name svelte-1a959v9">English</span> <!--[-1--><!--]--> <span class="language__code mono-micro svelte-1a959v9" lang="en" dir="ltr">EN</span></a></li><li class="language__item svelte-1a959v9" style="--order:1"><a class="language__link svelte-1a959v9" href="/fa" hreflang="fa" lang="fa" dir="rtl" aria-current="page" tabindex="-1" data-sveltekit-noscroll="true" data-sveltekit-keepfocus="true"><span class="language__ring svelte-1a959v9" aria-hidden="true"></span> <span class="language__name svelte-1a959v9">فارسی</span> <!--[-1--><!--]--> <span class="language__code mono-micro svelte-1a959v9" lang="en" dir="ltr">FA</span></a></li><li class="language__item svelte-1a959v9" style="--order:2"><a class="language__link svelte-1a959v9" href="/ckb" hreflang="ckb" lang="ckb" dir="rtl" tabindex="-1" data-sveltekit-noscroll="true" data-sveltekit-keepfocus="true"><span class="language__ring svelte-1a959v9" aria-hidden="true"></span> <span class="language__name svelte-1a959v9">کوردی</span> <!--[0--><span class="language__variety svelte-1a959v9">سۆرانی</span><!--]--> <span class="language__code mono-micro svelte-1a959v9" lang="en" dir="ltr">CKB</span></a></li><li class="language__item svelte-1a959v9" style="--order:3"><a class="language__link svelte-1a959v9" href="/kmr" hreflang="ku" lang="kmr" dir="ltr" tabindex="-1" data-sveltekit-noscroll="true" data-sveltekit-keepfocus="true"><span class="language__ring svelte-1a959v9" aria-hidden="true"></span> <span class="language__name svelte-1a959v9">Kurdî</span> <!--[0--><span class="language__variety svelte-1a959v9">Kurmancî</span><!--]--> <span class="language__code mono-micro svelte-1a959v9" lang="en" dir="ltr">KMR</span></a></li><li class="language__item svelte-1a959v9" style="--order:4"><a class="language__link svelte-1a959v9" href="/fi" hreflang="fi" lang="fi" dir="ltr" tabindex="-1" data-sveltekit-noscroll="true" data-sveltekit-keepfocus="true"><span class="language__ring svelte-1a959v9" aria-hidden="true"></span> <span class="language__name svelte-1a959v9">Suomi</span> <!--[-1--><!--]--> <span class="language__code mono-micro svelte-1a959v9" lang="en" dir="ltr">FI</span></a></li><!--]--></ul></div></div><!----></div><!----></div> <div class="hero__record svelte-1iqinn"><div class="record-line mono-micro svelte-rgxy91 record-line--compact"><span class="record-line__row record-line__row--filed svelte-rgxy91"><span class="record-line__plate svelte-rgxy91">لوح ۲۶<span class="record-line__dot svelte-rgxy91" aria-hidden="true">·</span></span> <span class="svelte-rgxy91">سقز</span></span> <span class="record-line__row svelte-rgxy91"><!--[-1--><!--]--> <span class="record-line__time svelte-rgxy91"><span aria-hidden="true" class="svelte-rgxy91">سقز</span> <time dir="ltr" class="svelte-rgxy91">--<span class="record-line__colon svelte-rgxy91">:</span>--<span class="record-line__colon svelte-rgxy91">:</span><span class="record-line__seconds svelte-rgxy91">--</span></time></span></span> <span class="sr-only svelte-rgxy91">زمان محلی در سقز، استان کُردستان، ایران</span></div><!----></div></header> <footer class="hero__bottom svelte-1iqinn"><!--[0--><div class="hero__plate svelte-1iqinn"><figure class="plate svelte-nhl3cr" data-plate="" data-object="singularity" aria-hidden="true" style="--mark: var(--object-singularity);"><svg class="plate__diagram svelte-nhl3cr" viewBox="0 0 64 42" preserveAspectRatio="xMidYMid meet"><!--[-1--><path class="plate__ray svelte-nhl3cr" d="M2 8h18M2 21h18M2 34h18"></path><path class="plate__lens svelte-nhl3cr" d="M28 4c8 6 8 28 0 34c-8-6-8-28 0-34z"></path><path class="plate__ray plate__body svelte-nhl3cr" d="M36 12l24 9M36 30l24-9M36 21h24"></path><circle class="plate__focus svelte-nhl3cr" cx="60" cy="21" r="1.6"></circle><!--]--></svg> <svg class="plate__cells svelte-nhl3cr" viewBox="0 0 8 9" preserveAspectRatio="xMidYMid slice"><!--[--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[0--><rect x="4" y="0" width="1" height="1"></rect><!--]--><!--[0--><rect x="5" y="0" width="1" height="1"></rect><!--]--><!--[0--><rect x="6" y="0" width="1" height="1"></rect><!--]--><!--[0--><rect x="7" y="0" width="1" height="1"></rect><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[0--><rect x="4" y="1" width="1" height="1"></rect><!--]--><!--[0--><rect x="5" y="1" width="1" height="1"></rect><!--]--><!--[0--><rect x="6" y="1" width="1" height="1"></rect><!--]--><!--[0--><rect x="7" y="1" width="1" height="1"></rect><!--]--><!--[0--><rect x="0" y="2" width="1" height="1"></rect><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[0--><rect x="4" y="2" width="1" height="1"></rect><!--]--><!--[0--><rect x="5" y="2" width="1" height="1"></rect><!--]--><!--[0--><rect x="6" y="2" width="1" height="1"></rect><!--]--><!--[0--><rect x="7" y="2" width="1" height="1"></rect><!--]--><!--[0--><rect x="0" y="3" width="1" height="1"></rect><!--]--><!--[0--><rect x="1" y="3" width="1" height="1"></rect><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[0--><rect x="5" y="3" width="1" height="1"></rect><!--]--><!--[0--><rect x="6" y="3" width="1" height="1"></rect><!--]--><!--[0--><rect x="7" y="3" width="1" height="1"></rect><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[0--><rect x="5" y="4" width="1" height="1"></rect><!--]--><!--[0--><rect x="6" y="4" width="1" height="1"></rect><!--]--><!--[0--><rect x="7" y="4" width="1" height="1"></rect><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[0--><rect x="4" y="5" width="1" height="1"></rect><!--]--><!--[0--><rect x="5" y="5" width="1" height="1"></rect><!--]--><!--[0--><rect x="6" y="5" width="1" height="1"></rect><!--]--><!--[0--><rect x="7" y="5" width="1" height="1"></rect><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[0--><rect x="3" y="6" width="1" height="1"></rect><!--]--><!--[0--><rect x="4" y="6" width="1" height="1"></rect><!--]--><!--[0--><rect x="5" y="6" width="1" height="1"></rect><!--]--><!--[0--><rect x="6" y="6" width="1" height="1"></rect><!--]--><!--[0--><rect x="7" y="6" width="1" height="1"></rect><!--]--><!--[0--><rect x="0" y="7" width="1" height="1"></rect><!--]--><!--[0--><rect x="1" y="7" width="1" height="1"></rect><!--]--><!--[-1--><!--]--><!--[-1--><!--]--><!--[0--><rect x="4" y="7" width="1" height="1"></rect><!--]--><!--[0--><rect x="5" y="7" width="1" height="1"></rect><!--]--><!--[0--><rect x="6" y="7" width="1" height="1"></rect><!--]--><!--[0--><rect x="7" y="7" width="1" height="1"></rect><!--]--><!--[0--><rect x="0" y="8" width="1" height="1"></rect><!--]--><!--[0--><rect x="1" y="8" width="1" height="1"></rect><!--]--><!--[0--><rect x="2" y="8" width="1" height="1"></rect><!--]--><!--[-1--><!--]--><!--[0--><rect x="4" y="8" width="1" height="1"></rect><!--]--><!--[0--><rect x="5" y="8" width="1" height="1"></rect><!--]--><!--[0--><rect x="6" y="8" width="1" height="1"></rect><!--]--><!--[0--><rect x="7" y="8" width="1" height="1"></rect><!--]--><!--]--></svg></figure><!----> <p class="hero__powered mono-micro svelte-1iqinn"><svg class="bridge svelte-526mtw" viewBox="-2 -1 4 2" aria-hidden="true"><path d="M1.03 -0.97L2 0L1.03 0.97L0.18 0.12L0.3 0L0.18 -0.12ZM-1.03 -0.97L-2 0L-1.03 0.97L-0.18 0.12L-0.3 0L-0.18 -0.12ZM0.831 -0.891L0.667 -1L0.333 -0.78L0 -1L-0.333 -0.78L-0.667 -1L-0.831 -0.891L-0.12 -0.18L0 -0.3L0.12 -0.18ZM0.831 0.891L0.667 1L0.333 0.78L0 1L-0.333 0.78L-0.667 1L-0.831 0.891L-0.12 0.18L0 0.3L0.12 0.18ZM0 -0.13L0.13 0L0 0.13L-0.13 0Z"></path></svg><!----> <span class="svelte-1iqinn">قدرت‌گرفته از</span> <span class="hero__engine svelte-1iqinn">هستهٔ کرم‌چاله</span></p><!----></div><!--]--> <div class="hero__artworks svelte-1iqinn"><!--[-1--><!--]--> <!--[-1--><!--]--></div> <ul class="hero__links svelte-1iqinn"><!--[--><li class="svelte-1iqinn"><a class="key svelte-1iqinn" href="https://github.com/sandeshmaurya-dev" rel="noreferrer"><span class="svelte-1iqinn">GitHub</span> <span class="key__arrow svelte-1iqinn" aria-hidden="true">↗</span></a></li><li class="svelte-1iqinn"><a class="key svelte-1iqinn" href="https://t.me/Innocent_zero737" rel="noreferrer"><span class="svelte-1iqinn">تلگرام</span> <span class="key__arrow svelte-1iqinn" aria-hidden="true">↗</span></a></li><li class="svelte-1iqinn"><a class="key svelte-1iqinn" href="mailto:sandeshmaurya2006@gmail.com"><span class="svelte-1iqinn">ایمیل</span> <span class="key__arrow svelte-1iqinn" aria-hidden="true">↗</span></a></li><!--]--></ul></footer></div> <p class="hero__cast voice-cast on-rule svelte-1iqinn" data-pieces="" aria-hidden="true"><span class="hero__cast-ink svelte-1iqinn" data-landing="">مهنــــدسی،</span></p> <p class="hero__hand voice-title on-rule svelte-1iqinn" data-pieces="" aria-hidden="true">به‌مثابهٔ هنر.</p> <!--[-1--><!--]--> <div class="hero__welcome svelte-1iqinn" style="visibility: hidden;"><p class="hero__welcome-index mono-micro svelte-1iqinn" style="opacity: 0;">۰۲ — چشم</p> <!--[--><p class="hero__welcome-line svelte-1iqinn"><span class="hero__welcome-ink svelte-1iqinn" style="translate: 0 140%;">خوش آمدی.</span></p><p class="hero__welcome-line svelte-1iqinn hero__welcome-line--quiet"><span class="hero__welcome-ink svelte-1iqinn" style="translate: 0 140%;">تجربه‌ای از بیرکار.</span></p><!--]--></div></div></section><!----> <section id="the-motto" class="lens svelte-1c5e8yw" data-sector="other-side" data-space="motto" aria-labelledby="lens-motto" style="--handover:0.16"><span id="sector-other-side" class="sector-anchor" aria-hidden="true"></span> <div class="lens__runway svelte-1c5e8yw"><div class="lens__clock svelte-1c5e8yw" aria-hidden="true"></div> <div class="lens__stage toolbar-foot svelte-1c5e8yw" data-lens-stage="" style="--withdraw:0; --core:0.00px"><div class="lens__shade svelte-1c5e8yw" aria-hidden="true"></div> <canvas class="lens__glass svelte-1c5e8yw" data-release="glass" aria-hidden="true"></canvas> <canvas class="lens__glass svelte-1c5e8yw" data-release="winding" aria-hidden="true"></canvas> <canvas class="lens__glass svelte-1c5e8yw" data-release="drift" aria-hidden="true"></canvas> <div class="mat svelte-vue9m0" data-contained="true" aria-hidden="true" style="--presence: 0;"><!--[--><i class="mat__furniture svelte-vue9m0" data-side="top"></i><i class="mat__furniture svelte-vue9m0" data-side="end"></i><i class="mat__furniture svelte-vue9m0" data-side="bottom"></i><i class="mat__furniture svelte-vue9m0" data-side="start"></i><!--]--> <i class="mat__edge svelte-vue9m0"></i> <!--[--><i class="mat__lock svelte-vue9m0" data-corner="top-start"></i><i class="mat__lock svelte-vue9m0" data-corner="top-end"></i><i class="mat__lock svelte-vue9m0" data-corner="bottom-start"></i><i class="mat__lock svelte-vue9m0" data-corner="bottom-end"></i><!--]--> <span class="mat__slug mono-micro svelte-vue9m0">۰۳ — سوی دیگر</span></div><!----> <div class="lens__print svelte-1c5e8yw"><p class="lens__index folio mono-micro svelte-1c5e8yw" style="opacity:0">۰۳ — سوی دیگر</p> <div class="motto svelte-2qm8gq"><svg class="motto__ring svelte-2qm8gq" aria-hidden="true" style="opacity:0"><circle cx="50%" cy="50%" r="0"></circle></svg> <p class="motto__caption mono-micro svelte-2qm8gq" aria-hidden="true" style="opacity:0; --r:0px">نور خمیده از راه می‌رسد</p> <div class="motto__block svelte-2qm8gq"><h2 id="lens-motto" class="motto__text svelte-2qm8gq" aria-label="مهندسی و هنر را باید با یک عدسی دید."><!--[--><span class="motto__line svelte-2qm8gq" data-line="0" style="--step:0" aria-hidden="true"><span class="motto__run svelte-2qm8gq"><!--[--><span class="motto__word svelte-2qm8gq"><!--[--><span class="motto__glyph svelte-2qm8gq" data-glyph="">مهند</span><span class="motto__glyph svelte-2qm8gq" data-glyph="">سی</span><!--]--></span> <span class="motto__word svelte-2qm8gq"><!--[--><span class="motto__glyph svelte-2qm8gq" data-glyph="">و</span><!--]--></span> <span class="motto__word svelte-2qm8gq"><!--[--><span class="motto__glyph svelte-2qm8gq" data-glyph="">هنر</span><!--]--></span> <span class="motto__word svelte-2qm8gq"><!--[--><span class="motto__glyph svelte-2qm8gq" data-glyph="">ر</span><span class="motto__glyph svelte-2qm8gq" data-glyph="">ا</span><!--]--></span><!--]--></span></span><span class="motto__line svelte-2qm8gq" data-line="1" style="--step:0.5" aria-hidden="true"><span class="motto__run svelte-2qm8gq"><!--[--><span class="motto__word svelte-2qm8gq"><!--[--><span class="motto__glyph svelte-2qm8gq" data-glyph="">با</span><span class="motto__glyph svelte-2qm8gq" data-glyph="">ید</span><!--]--></span> <span class="motto__word svelte-2qm8gq"><!--[--><span class="motto__glyph svelte-2qm8gq" data-glyph="">با</span><!--]--></span> <span class="motto__word svelte-2qm8gq"><!--[--><span class="motto__glyph svelte-2qm8gq" data-glyph="">یک</span><!--]--></span> <span class="motto__word svelte-2qm8gq"><!--[--><span class="motto__glyph svelte-2qm8gq" data-glyph="">عد</span><span class="motto__glyph svelte-2qm8gq" data-glyph="">سی</span><!--]--></span><!--]--></span></span><span class="motto__line svelte-2qm8gq" data-line="2" style="--step:1" aria-hidden="true"><span class="motto__run svelte-2qm8gq"><!--[--><span class="motto__word svelte-2qm8gq"><!--[--><span class="motto__glyph svelte-2qm8gq" data-glyph="">د</span><span class="motto__glyph svelte-2qm8gq" data-glyph="">ید</span><span class="motto__glyph svelte-2qm8gq" data-glyph="">.</span><!--]--></span><!--]--></span></span><!--]--></h2> <p class="motto__hand svelte-2qm8gq" aria-hidden="true"><span class="motto__hand-set motto__hand-set--wide svelte-2qm8gq"><!--[--><span class="motto__hand-line svelte-2qm8gq" data-hand="0" style="--step:0">مهندسی و هنر را</span><span class="motto__hand-line svelte-2qm8gq" data-hand="1" style="--step:0.5">باید با یک عدسی</span><span class="motto__hand-line svelte-2qm8gq" data-hand="2" style="--step:1">دید.</span><!--]--></span> <span class="motto__hand-set motto__hand-set--tall svelte-2qm8gq"><!--[--><span class="motto__hand-line svelte-2qm8gq" style="--step:0">مهندسی</span><span class="motto__hand-line svelte-2qm8gq" style="--step:0.25">و هنر را</span><span class="motto__hand-line svelte-2qm8gq" style="--step:0.5">باید</span><span class="motto__hand-line svelte-2qm8gq" style="--step:0.75">با یک عدسی</span><span class="motto__hand-line svelte-2qm8gq" style="--step:1">دید.</span><!--]--></span></p></div> <canvas class="motto__canvas svelte-2qm8gq" aria-hidden="true"></canvas></div><!----></div></div></div></section><!----> <!--[0--><section class="structure svelte-1ok4o7e" data-sector="birkar" data-space="motto" data-scene="waiting" aria-labelledby="structure-index"><span id="sector-birkar" class="sector-anchor" aria-hidden="true"></span> <div class="structure__course svelte-1ok4o7e"><div class="structure__runway svelte-1ok4o7e" aria-hidden="true"></div> <div class="structure__epilogue svelte-1ok4o7e" aria-hidden="true"></div> <div class="structure__stage toolbar-foot svelte-1ok4o7e" data-instrument="" style="--set-top: 0px; --set-side: 0px; --set-bottom: 0px;"><!----><canvas class="structure__canvas svelte-1ok4o7e" aria-label="شعار، ریخته در حروف سربی: هر حرف یک قطعه، هر سطر تیری از حروف، و سه تیر که در گوشه‌ای بر سه محور فضا به هم می‌رسند، هر کدام با گرانش خودش؛ و پشتشان سه برگه که قالب بر آن‌ها در پلان، نما و برش کشیده شده است. حروف پراکندهٔ نام او کنارش آویخته‌اند. بیرکار بر لبهٔ حرفی از سطر نخست نشسته است. با W، A، S و D یا کلیدهای جهت او را راه ببر، با Shift بدو و با Space بپر — نگه دار تا بلندتر بپرد؛ لبه‌های در دسترس را می‌گیرد و از آن‌ها می‌آویزد، که رو به دیوار بالا می‌رود و رو به بیرون رها می‌کند. G را بزن تا گرانش به سوی سطحی که رو به آن است بچرخد، یا به درون دیواری که از آن آویخته است. روی صفحهٔ لمسی، شستی بگذار و بکش تا راه برود — کشیدنی تند صفحه را پیش می‌برد — و ضربه بزن تا بپرد؛ شست دوم می‌پراندش، نگه‌داشته بلندتر، و کشیده عدسی را می‌چرخاند؛ سه ضربهٔ تند گرانش را می‌چرخاند. در انتهای دور هر تیر رادیویی ایستاده که میان ایستگاه‌ها خش‌خش می‌کند؛ کنار یکی، F یا دکمه را نگه دار تا تنظیمش کنی. سه رادیو، که به ترتیب پیدا شوند، سازه را بیدار می‌کنند."></canvas><!----> <canvas class="set svelte-nl35wo" aria-hidden="true"></canvas> <!--[-1--><!--]--><!----> <p class="structure__index folio mono-micro svelte-1ok4o7e" aria-hidden="true" style="opacity:1">۰۳ — سوی دیگر</p> <p id="structure-index" class="structure__index folio mono-micro svelte-1ok4o7e" style="opacity:0">۰۴ — بیرکار</p> <p class="structure__sampled mono-micro svelte-1ok4o7e" aria-hidden="true" style="opacity:0"><span>نمونه‌برداری در</span> <!--[-1--><!--]--></p> <!--[-1--><!--]--> <svg class="structure__leaders svelte-1ok4o7e" aria-hidden="true"><!--[--><!--]--></svg> <!--[--><!--]--> <p class="structure__view mono-micro svelte-1ok4o7e" aria-live="polite"><span>پلان</span> <span class="structure__axis svelte-1ok4o7e">g −Y</span></p> <!--[-1--><!--]--> <!--[-1--><!--]--></div></div></section><!--]--><!----> <section id="resolution" class="resolution svelte-ts2jdc" data-sector="resolution" data-space="resolution" aria-labelledby="resolution-title"><span id="sector-resolution" class="sector-anchor" aria-hidden="true"></span> <div class="resolution__sheet svelte-ts2jdc" style="--rows:10; --cover-top:0px; --reserve-desk:70; --reserve-tablet:103; --reserve-phone:110"><!--[-1--><!--]--> <div class="resolution__arrival svelte-ts2jdc"><div class="resolution__stage svelte-ts2jdc"><h2 id="resolution-title" class="sr-only">ساندش — بخش پنجم: ساندش، با وضوحی رو به افزایش.</h2> <!--[-1--><i class="resolution__seed svelte-ts2jdc" aria-hidden="true" style="--c:8; --r:5"></i><!--]--> <p class="resolution__sampled mono-micro svelte-ts2jdc" aria-hidden="true" style="opacity:1"><span>نمونه‌برداری در</span> <span class="resolution__faint svelte-ts2jdc">۱ × ۱</span></p> <p class="resolution__seed-caption mono-micro svelte-ts2jdc" aria-hidden="true" style="--c:8; --r:5; opacity:1"><span class="resolution__value svelte-ts2jdc">۱ × ۱</span> <!--[--><span>جهان،</span><span>یک‌بار نمونه‌برداری‌شده.</span><!--]--></p></div></div> <!--[-1--><div class="resolution__reserve svelte-ts2jdc"></div><!--]--></div></section><!----> <section id="notes" class="notes svelte-11e4rom" data-sector="notes" data-space="notes" aria-labelledby="notes-title"><span id="sector-notes" class="sector-anchor" aria-hidden="true"></span> <div class="notes__runway svelte-11e4rom" style="--screens:18.75; --reduced-screens:13.45"><div class="notes__stage toolbar-foot svelte-11e4rom"><h2 id="notes-title" class="sr-only">به کجا چنین شتابان؟</h2> <!--[-1--><p class="sr-only">بخش ششم: یادداشت‌ها — صفحه‌ای از نوشته، که با دست جابه‌جا می‌شود.</p><!--]--></div></div></section><!----> <!--[-1--><!--]--><!----><!--]--><!--]--><!----><!--]--><!--]--> <!--[-1--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_1vzh90 = {
+						base: new URL(".", location).pathname.slice(0, -1)
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("./_app/immutable/entry/start.DZAEokQm.js"),
+						import("./_app/immutable/entry/app.DiN7Zou7.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 3],
+							data: [null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"8f545e8934d74549a0c238031f6515d8","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

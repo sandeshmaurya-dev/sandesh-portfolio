@@ -1,0 +1,1 @@
+import{vt as e,yt as t}from"../chunks/CDrkfc4T.js";import"../chunks/xihTtKlq.js";import{t as n}from"../chunks/BuBvoS3Q.js";function r(r,i){t(i,!0),n(r,{get words(){return i.data.words},tab:`security`}),e()}export{r as component};

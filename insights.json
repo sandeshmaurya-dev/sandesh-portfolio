@@ -1,0 +1,195 @@
+{
+  "personal_profile": {
+    "role": "SOFTWARE & GRAPHICS ENGINEER \u00b7 ART DIRECTOR",
+    "lede": "I don\u2019t set out to build products. I make works \u2014 things with a language of their own, that you remember, and come back to at different moments.",
+    "statement": [
+      "Full resolution",
+      "is a conversation."
+    ],
+    "email": "sandesh@gmail.com"
+  },
+  "works": [
+    {
+      "index": "01",
+      "slug": "auditorium",
+      "name": "Auditorium",
+      "kind": "SOCIAL NETWORK \u00b7 WRITING, R\u00c9SUM\u00c9S, DISCUSSION",
+      "summary": "An open writing platform. A room where a text is read out loud.",
+      "stack": "PYTHON \u00b7 DJANGO \u00b7 REACT",
+      "specimen": "COMPASS \u00b7 BEARING 060\u00b0",
+      "mark": "auditorium",
+      "muted": true,
+      "href": null
+    },
+    {
+      "index": "02",
+      "slug": "arc",
+      "name": "Arc",
+      "kind": "MESSAGING",
+      "summary": "A minimal messenger with a maximal spine \u2014 scalable, opinionated, quiet.",
+      "stack": "GO \u00b7 NEXT.JS \u00b7 POSTGRES",
+      "specimen": "GATEWAY \u00b7 ISOMETRIC 30\u00b0",
+      "mark": "arc",
+      "muted": true,
+      "href": null
+    },
+    {
+      "index": "03",
+      "slug": "evin",
+      "name": "Ev\u00een",
+      "kind": "MUSIC PLAYER \u00b7 EVERY PLATFORM",
+      "summary": "Offline-first, cross-platform, and named for love. It works with no signal.",
+      "stack": "DART \u00b7 FLUTTER",
+      "specimen": "SATURN \u00b7 AXIAL TILT 26.73\u00b0",
+      "mark": "evin",
+      "muted": false,
+      "href": "/works/evin"
+    },
+    {
+      "index": "04",
+      "slug": "wormholekernel",
+      "name": "WormHoleKernel",
+      "kind": "ENGINE & FRAMEWORK \u00b7 THE STUDIO\u2019S OWN",
+      "summary": "The studio\u2019s own engine and framework for cinematic web experiences: one frame loop under everything, built from small kits that each take on one part of the work.",
+      "stack": "TYPESCRIPT \u00b7 SVELTE \u00b7 WEBGL2 \u00b7 WEBGPU",
+      "specimen": "BRIDGE \u00b7 45\u00b0",
+      "mark": "wormholekernel",
+      "muted": false,
+      "href": "/works/wormholekernel"
+    }
+  ],
+  "disciplines": [
+    {
+      "index": "01",
+      "title": "GAME DEVELOPMENT & ART DIRECTION",
+      "note": "Worlds made to be played and looked at: Unity and Godot in C#, Blender and Substance 3D for what is seen, shaders for how it is lit. Where the engineering is the drawing.",
+      "depth": 0.8,
+      "tools": [
+        "UNITY",
+        "C#",
+        "GODOT",
+        "BLENDER",
+        "SUBSTANCE 3D",
+        "GLSL",
+        "WEBGPU",
+        "THREE.JS"
+      ]
+    },
+    {
+      "index": "02",
+      "title": "SERVER-SIDE",
+      "note": "Go and Python where the load is. Systems that stay boring under pressure.",
+      "depth": 0.86,
+      "tools": [
+        "GO",
+        "PYTHON",
+        "GIN",
+        "NESTJS",
+        "DJANGO",
+        "FASTAPI",
+        "POSTGRES",
+        "REDIS",
+        "MONGO"
+      ]
+    },
+    {
+      "index": "03",
+      "title": "WEB CLIENT",
+      "note": "Interfaces built like instruments: one frame loop, measured motion, nothing decorative that is not also structural.",
+      "depth": 0.94,
+      "tools": [
+        "SVELTE",
+        "SVELTEKIT",
+        "REACT",
+        "NEXT.JS",
+        "TYPESCRIPT"
+      ]
+    },
+    {
+      "index": "04",
+      "title": "CROSS-PLATFORM",
+      "note": "One codebase, offline-first, identical on every screen it reaches.",
+      "depth": 0.72,
+      "tools": [
+        "DART",
+        "FLUTTER"
+      ]
+    }
+  ],
+  "influences_taste": [
+    {
+      "id": "X6CqRjSTD-",
+      "name": "Halo Infinite",
+      "kind": "game",
+      "credit": "343 INDUSTRIES \u00b7 2021"
+    },
+    {
+      "id": "Prcth1pkYQ",
+      "name": "Kendrick Lamar",
+      "kind": "music",
+      "credit": "COMPTON \u00b7 2004 \u2014"
+    },
+    {
+      "id": "b-z5CBvVj6",
+      "name": "CONTROL",
+      "kind": "game",
+      "credit": "REMEDY \u00b7 2019"
+    },
+    {
+      "id": "dHuuqhNOJh",
+      "name": "Alan Wake II",
+      "kind": "game",
+      "credit": "REMEDY \u00b7 2023"
+    },
+    {
+      "id": "N7CKA-AM3A",
+      "name": "Star Wars",
+      "kind": "film",
+      "credit": "LUCASFILM \u00b7 1977 \u2014"
+    }
+  ],
+  "supported_locales": [
+    "en",
+    "ckb",
+    "fa",
+    "fi",
+    "kmr"
+  ],
+  "graphics_engine": {
+    "framework": "Three.js (with TSL - Three Shading Language) and Custom WebGL Shaders",
+    "interactive_modes": [
+      {
+        "name": "singularity",
+        "interaction": "dive",
+        "motion": "fall",
+        "shader_type": "Relativistic raymarching of a Schwarzschild black hole with accretion disk, photon sphere (1.5 Rs), ISCO (3.0 Rs), gravitational lensing deflection LUT (32 samples), and chromatic spectral dispersion (427nm - 677nm)."
+      },
+      {
+        "name": "galaxy",
+        "interaction": "wind",
+        "motion": "orbit",
+        "shader_type": "Multi-component spiral galaxy particle simulation featuring Nucleus, Bar, Inner/Outer Arms, Young Blue Stars, H-II Nebulae, Halo, and Interstellar Dust Reddening."
+      },
+      {
+        "name": "meadow",
+        "interaction": "dive",
+        "motion": "wind",
+        "shader_type": "Procedural botanical dandelion clock simulation with 168 seeds, 88 bristles per seed, and 15,161 wind-responsive fibers."
+      },
+      {
+        "name": "still_life_lens",
+        "interaction": "mouse tracking / lens refraction",
+        "motion": "liquid surface & lighting reaction",
+        "shader_type": "Analytical Signed Distance Field (SDF) raymarched teacup with liquid, saucer, handle, table, and dynamic day/night light casting."
+      }
+    ]
+  },
+  "frontend_stack": {
+    "core_framework": "Svelte 5 / SvelteKit",
+    "bundler": "Vite",
+    "styling": "Scoped CSS with modern CSS custom properties and mix-blend-mode for dynamic contrast",
+    "typography": "Self-hosted variable WOFF2 fonts (Cast Latin, Mono Latin, Sans Latin, Serif Display Latin)",
+    "cursor_system": "Custom reactive SVG/DOM cursor layer with state-driven ring and arm geometry responding to hovered targets (links, lens, interactive canvas)",
+    "i18n_strategy": "Headless dynamic sheets fetched asynchronously via /api/sheet/<locale> without full page reloads"
+  }
+}

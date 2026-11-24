@@ -1,0 +1,777 @@
+{
+  "language": "en",
+  "resolution": {
+    "cover": {
+      "role": "2ND YEAR B.TECH CSE (DS & AI) · STUDENT & DEVELOPER",
+      "lede": "Student, builder, and engineer. Learning computer science from first principles — Data Structures & Algorithms, modern Web technologies, and AI & Data Science systems.",
+      "portrait": "Sandesh standing on the balcony with the Indian flag."
+    },
+    "works": {
+      "lede": "Four engineering platforms and systems. Built end to end — from algorithmic logic to interactive interfaces.",
+      "pieces": [
+        {
+          "index": "01",
+          "slug": "auditorium",
+          "name": "Auditorium",
+          "kind": "DATA SCIENCE & AI · INTELLIGENT ANALYTICS",
+          "summary": "An interactive machine learning & dataset exploration workbench: exploratory data analysis, statistical modeling, and automated data profiling.",
+          "stack": "PYTHON · NUMPY · PANDAS · SCIKIT-LEARN",
+          "specimen": "COMPASS · BEARING 060°",
+          "mark": "auditorium",
+          "muted": true,
+          "href": null
+        },
+        {
+          "index": "02",
+          "slug": "arc",
+          "name": "Arc",
+          "kind": "DATA STRUCTURES & ALGORITHMS · ENGINE",
+          "summary": "A high-performance algorithmic simulation and visualizer: balanced trees, graph traversal routines, and dynamic memory optimizations.",
+          "stack": "C · PYTHON · DSA · ALGORITHMS",
+          "specimen": "GATEWAY · ISOMETRIC 30°",
+          "mark": "arc",
+          "muted": true,
+          "href": null
+        },
+        {
+          "index": "03",
+          "slug": "evin",
+          "name": "Web Platform",
+          "kind": "WEB APPLICATION · INTERACTIVE INTERFACE",
+          "summary": "Modern responsive client platform built with clean semantic architecture, dynamic DOM manipulation, and fluid CSS styling.",
+          "stack": "HTML5 · CSS3 · JAVASCRIPT · DOM",
+          "specimen": "SATURN · AXIAL TILT 26.73°",
+          "mark": "evin",
+          "muted": false,
+          "href": null
+        },
+        {
+          "index": "04",
+          "slug": "wormholekernel",
+          "name": "WormHoleKernel",
+          "kind": "CORE SYSTEMS & ENGINEERING BENCH",
+          "summary": "Low-level computational core and systems simulation: process management, memory paging, and fundamental computer science architectures.",
+          "stack": "C · PYTHON · LINUX · SYSTEM DESIGN",
+          "specimen": "BRIDGE · 45°",
+          "mark": "wormholekernel",
+          "muted": false,
+          "href": "/works/wormholekernel"
+        }
+      ]
+    },
+    "practice": {
+      "lede": "Four foundational pillars of my engineering journey: Data Science & AI, Data Structures & Algorithms, Modern Web Development, and Core Computer Science.",
+      "disciplines": [
+        {
+          "index": "01",
+          "title": "DATA SCIENCE & AI",
+          "note": "2nd Year B.Tech CSE (DS & AI). Exploratory data analysis, statistical modeling, feature engineering, and neural network foundations with Python, NumPy, and Pandas.",
+          "depth": 0.88,
+          "tools": [
+            "PYTHON",
+            "NUMPY",
+            "PANDAS",
+            "SCIKIT-LEARN",
+            "MATPLOTLIB",
+            "SEABORN",
+            "SQL",
+            "DATA SCIENCE"
+          ]
+        },
+        {
+          "index": "02",
+          "title": "DATA STRUCTURES & ALGORITHMS",
+          "note": "Core algorithmic problem-solving in C and Python: arrays, linked lists, stacks, queues, trees, graphs, sorting, searching, and dynamic programming.",
+          "depth": 0.92,
+          "tools": [
+            "C",
+            "PYTHON",
+            "DSA",
+            "ALGORITHMS",
+            "TIME COMPLEXITY",
+            "SPACE COMPLEXITY",
+            "RECURSION",
+            "DYNAMIC PROGRAMMING"
+          ]
+        },
+        {
+          "index": "03",
+          "title": "WEB DEVELOPMENT",
+          "note": "Responsive and structured web client applications: semantic HTML5 markup, modern CSS3 layouts with Flexbox and Grid, and vanilla JavaScript DOM mechanics.",
+          "depth": 0.86,
+          "tools": [
+            "HTML5",
+            "CSS3",
+            "JAVASCRIPT",
+            "RESPONSIVE DESIGN",
+            "DOM",
+            "FRONTEND",
+            "GIT",
+            "GITHUB"
+          ]
+        },
+        {
+          "index": "04",
+          "title": "CORE COMPUTER SCIENCE",
+          "note": "Foundational engineering disciplines: Object-Oriented Programming (OOP), Database Management Systems (DBMS), Operating Systems concepts, and Linux environments.",
+          "depth": 0.8,
+          "tools": [
+            "C",
+            "PYTHON",
+            "OOP",
+            "DBMS",
+            "SQL",
+            "OPERATING SYSTEMS",
+            "COMPUTER NETWORKS",
+            "LINUX"
+          ]
+        }
+      ],
+      "kin": {
+        "PYTHON": [
+          "NUMPY",
+          "PANDAS",
+          "SCIKIT-LEARN",
+          "DSA",
+          "OOP",
+          "SQL",
+          "DATA SCIENCE"
+        ],
+        "C": [
+          "DSA",
+          "ALGORITHMS",
+          "OPERATING SYSTEMS",
+          "OOP"
+        ],
+        "NUMPY": [
+          "PYTHON",
+          "PANDAS",
+          "SCIKIT-LEARN",
+          "MATPLOTLIB"
+        ],
+        "PANDAS": [
+          "PYTHON",
+          "NUMPY",
+          "SCIKIT-LEARN",
+          "SEABORN",
+          "SQL"
+        ],
+        "SCIKIT-LEARN": [
+          "PYTHON",
+          "NUMPY",
+          "PANDAS",
+          "DATA SCIENCE"
+        ],
+        "MATPLOTLIB": [
+          "PYTHON",
+          "NUMPY",
+          "SEABORN"
+        ],
+        "SEABORN": [
+          "PYTHON",
+          "PANDAS",
+          "MATPLOTLIB"
+        ],
+        "DATA SCIENCE": [
+          "PYTHON",
+          "PANDAS",
+          "SCIKIT-LEARN",
+          "SQL"
+        ],
+        "DSA": [
+          "C",
+          "PYTHON",
+          "ALGORITHMS",
+          "TIME COMPLEXITY",
+          "SPACE COMPLEXITY",
+          "DYNAMIC PROGRAMMING"
+        ],
+        "ALGORITHMS": [
+          "C",
+          "PYTHON",
+          "DSA",
+          "RECURSION",
+          "DYNAMIC PROGRAMMING"
+        ],
+        "TIME COMPLEXITY": [
+          "DSA",
+          "ALGORITHMS",
+          "SPACE COMPLEXITY"
+        ],
+        "SPACE COMPLEXITY": [
+          "DSA",
+          "ALGORITHMS",
+          "TIME COMPLEXITY"
+        ],
+        "RECURSION": [
+          "C",
+          "PYTHON",
+          "DSA",
+          "DYNAMIC PROGRAMMING"
+        ],
+        "DYNAMIC PROGRAMMING": [
+          "DSA",
+          "ALGORITHMS",
+          "RECURSION"
+        ],
+        "HTML5": [
+          "CSS3",
+          "JAVASCRIPT",
+          "RESPONSIVE DESIGN",
+          "DOM"
+        ],
+        "CSS3": [
+          "HTML5",
+          "JAVASCRIPT",
+          "RESPONSIVE DESIGN"
+        ],
+        "JAVASCRIPT": [
+          "HTML5",
+          "CSS3",
+          "DOM",
+          "FRONTEND"
+        ],
+        "RESPONSIVE DESIGN": [
+          "HTML5",
+          "CSS3",
+          "FRONTEND"
+        ],
+        "DOM": [
+          "HTML5",
+          "JAVASCRIPT"
+        ],
+        "FRONTEND": [
+          "HTML5",
+          "CSS3",
+          "JAVASCRIPT"
+        ],
+        "OOP": [
+          "C",
+          "PYTHON",
+          "DBMS"
+        ],
+        "DBMS": [
+          "SQL",
+          "PYTHON",
+          "OPERATING SYSTEMS"
+        ],
+        "SQL": [
+          "DBMS",
+          "PYTHON",
+          "PANDAS"
+        ],
+        "OPERATING SYSTEMS": [
+          "C",
+          "LINUX",
+          "COMPUTER NETWORKS"
+        ],
+        "COMPUTER NETWORKS": [
+          "OPERATING SYSTEMS",
+          "LINUX"
+        ],
+        "LINUX": [
+          "OPERATING SYSTEMS",
+          "GIT",
+          "C"
+        ],
+        "GIT": [
+          "GITHUB",
+          "LINUX"
+        ],
+        "GITHUB": [
+          "GIT"
+        ]
+      }
+    },
+    "taste": {
+      "lede": "Selected open-source repositories and engineering works.",
+      "items": [
+        {
+          "id": "repo-kingcobra",
+          "name": "Kingcobra",
+          "kind": "compiler",
+          "credit": "RUST · HANDMADE COMPILER · 2026",
+          "url": "https://github.com/sandeshmaurya-dev/KINGCOBRA"
+        },
+        {
+          "id": "repo-zbridge",
+          "name": "Z-Bridge",
+          "kind": "ai",
+          "credit": "AUTONOMOUS AI AGENT · EXTENSION · 2026",
+          "url": "https://github.com/sandeshmaurya-dev/zbridge"
+        },
+        {
+          "id": "repo-couponvault",
+          "name": "CouponVault",
+          "kind": "platform",
+          "credit": "NEXT.JS 14 · TYPESCRIPT · 2026",
+          "url": "https://github.com/sandeshmaurya-dev/CouponVault"
+        },
+        {
+          "id": "repo-ciphervault",
+          "name": "CipherVault",
+          "kind": "security",
+          "credit": "MILITARY-GRADE ENCRYPTION · 2026",
+          "url": "https://github.com/sandeshmaurya-dev/Hellsecure-"
+        },
+        {
+          "id": "repo-ghostwriter",
+          "name": "Ghostwriter",
+          "kind": "tool",
+          "credit": "KOTLIN · INVISIBLE AI ASSISTANT · 2026",
+          "url": "https://github.com/sandeshmaurya-dev/Ghostwriter"
+        }
+      ]
+    },
+    "contact": {
+      "statement": [
+        "Full resolution",
+        "is a conversation."
+      ],
+      "email": "sandeshmaurya2006@gmail.com",
+      "portrait": "Sandesh standing on the balcony with the Indian flag."
+    }
+  },
+  "notes": {
+    "stations": [
+      {
+        "station": 1,
+        "note": {
+          "index": "01",
+          "slug": "draw-on-change",
+          "title": "Draw on change",
+          "genre": "essay",
+          "lede": "A frame that could not look different is a frame not worth drawing.",
+          "status": "published",
+          "year": 2026,
+          "language": "en",
+          "href": "/notes/draw-on-change",
+          "cover": {
+            "image": {
+              "src": "/media/images/d875be2f5c04156928a12fcacdbb552ab56a3dc1193f02f8499a5400002bf98c/1280.webp",
+              "width": 2048,
+              "height": 1152,
+              "sources": [
+                {
+                  "src": "/media/images/d875be2f5c04156928a12fcacdbb552ab56a3dc1193f02f8499a5400002bf98c/640.webp",
+                  "width": 640
+                },
+                {
+                  "src": "/media/images/d875be2f5c04156928a12fcacdbb552ab56a3dc1193f02f8499a5400002bf98c/1280.webp",
+                  "width": 1280
+                },
+                {
+                  "src": "/media/images/d875be2f5c04156928a12fcacdbb552ab56a3dc1193f02f8499a5400002bf98c/2048.webp",
+                  "width": 2048
+                }
+              ]
+            },
+            "slot": {
+              "slot": "cover",
+              "aspect": 1.25,
+              "source": null,
+              "placement": "",
+              "prompt": ""
+            },
+            "alt": "",
+            "credit": "kAre-n"
+          }
+        }
+      },
+      {
+        "station": 2,
+        "note": {
+          "index": "02",
+          "slug": "light-arrives-already-bent",
+          "title": "Light arrives already bent",
+          "genre": "essay",
+          "lede": "Why a page about engineering begins with a black hole, and what a lens is for.",
+          "status": "published",
+          "year": 2026,
+          "language": "fa",
+          "href": "/fa/notes/light-arrives-already-bent",
+          "cover": {
+            "image": {
+              "src": "/media/images/f26df426a19203872269133a755fd602ec03ddcdf5e4b4310ab9fa492b834602/1280.webp",
+              "width": 2048,
+              "height": 1152,
+              "sources": [
+                {
+                  "src": "/media/images/f26df426a19203872269133a755fd602ec03ddcdf5e4b4310ab9fa492b834602/640.webp",
+                  "width": 640
+                },
+                {
+                  "src": "/media/images/f26df426a19203872269133a755fd602ec03ddcdf5e4b4310ab9fa492b834602/1280.webp",
+                  "width": 1280
+                },
+                {
+                  "src": "/media/images/f26df426a19203872269133a755fd602ec03ddcdf5e4b4310ab9fa492b834602/2048.webp",
+                  "width": 2048
+                }
+              ]
+            },
+            "slot": {
+              "slot": "06 — NOTES · cover 02 · Light arrives already bent",
+              "aspect": 1.5,
+              "source": null,
+              "placement": "A mountain road bending out of frame across a high pass in Kurdistan at first light, one small car on it, the curve of the road the subject as much as the car. Horizon at 36% of the height; subject at 68% across, 64% down, heading 60° from the picture's up.",
+              "prompt": "A mountain road bending out of frame across a high pass in Kurdistan at first light, one small car on it, the curve of the road the subject as much as the car. Black-and-white documentary photograph, natural light, fine grain, deep blacks and clean mid-grays, no color cast, no text, no logos, no borders, no vignette; one clear subject, generous negative space, shot square-on or from directly above, as if for a printed poster — the figure small against architecture or land, going somewhere. Aspect 1.5:1.",
+              "composition": {
+                "horizon": 0.36,
+                "subject": [
+                  0.68,
+                  0.64
+                ],
+                "heading": 60
+              }
+            },
+            "alt": "صحنه‌ای بروتالیستی از کارن.",
+            "credit": "kAre-n"
+          }
+        }
+      },
+      {
+        "station": 3,
+        "note": {
+          "index": "03",
+          "slug": "bir",
+          "title": "Bîr",
+          "genre": "photographs",
+          "lede": "Thought, memory, a well: the half of the name you draw from.",
+          "status": "published",
+          "year": 2026,
+          "language": "ckb",
+          "href": "/ckb/notes/bir",
+          "cover": {
+            "image": {
+              "src": "/media/images/db15a624cae9f75859c3e0cdfa6bb5b209bc3e1ed9f4fcb4d838f74cc0707f88/1280.webp",
+              "width": 1280,
+              "height": 1198,
+              "sources": [
+                {
+                  "src": "/media/images/db15a624cae9f75859c3e0cdfa6bb5b209bc3e1ed9f4fcb4d838f74cc0707f88/640.webp",
+                  "width": 640
+                },
+                {
+                  "src": "/media/images/db15a624cae9f75859c3e0cdfa6bb5b209bc3e1ed9f4fcb4d838f74cc0707f88/1280.webp",
+                  "width": 1280
+                }
+              ]
+            },
+            "slot": {
+              "slot": "06 — NOTES · cover 03 · Bîr",
+              "aspect": 1,
+              "source": null,
+              "placement": "An old stone well in a courtyard in Saqqez, seen from directly above: the dark circle of the water at the center, a figure’s shadow falling across the rim. Horizon at none — seen from above; subject at 50% across, 50% down, still.",
+              "prompt": "An old stone well in a courtyard in Saqqez, seen from directly above: the dark circle of the water at the center, a figure’s shadow falling across the rim. Black-and-white documentary photograph, natural light, fine grain, deep blacks and clean mid-grays, no color cast, no text, no logos, no borders, no vignette; one clear subject, generous negative space, shot square-on or from directly above, as if for a printed poster — the figure small against architecture or land, going somewhere. Aspect 1:1.",
+              "composition": {
+                "horizon": null,
+                "subject": [
+                  0.5,
+                  0.5
+                ],
+                "heading": null
+              }
+            },
+            "alt": "فڕۆکە و دار.",
+            "credit": "Sandesh"
+          }
+        }
+      },
+      {
+        "station": 4,
+        "note": {
+          "index": "04",
+          "slug": "the-parts-nobody-sees",
+          "title": "The parts nobody sees",
+          "genre": "essay",
+          "lede": "The inside of a thing is also a surface. Someone will open it.",
+          "status": "published",
+          "year": 2026,
+          "language": "en",
+          "href": "/notes/the-parts-nobody-sees",
+          "cover": {
+            "image": {
+              "src": "/media/images/0d5d50c9e25544b0a9f1071b6f1fd1a850140d0b66af1957b626f9fa601012f3/1280.webp",
+              "width": 1707,
+              "height": 2560,
+              "sources": [
+                {
+                  "src": "/media/images/0d5d50c9e25544b0a9f1071b6f1fd1a850140d0b66af1957b626f9fa601012f3/640.webp",
+                  "width": 640
+                },
+                {
+                  "src": "/media/images/0d5d50c9e25544b0a9f1071b6f1fd1a850140d0b66af1957b626f9fa601012f3/1280.webp",
+                  "width": 1280
+                },
+                {
+                  "src": "/media/images/0d5d50c9e25544b0a9f1071b6f1fd1a850140d0b66af1957b626f9fa601012f3/1707.webp",
+                  "width": 1707
+                }
+              ]
+            },
+            "slot": {
+              "slot": "06 — NOTES · cover 04 · The parts nobody sees",
+              "aspect": 0.6666666666666666,
+              "source": null,
+              "placement": "The back of a brutalist concrete building: service stairs, a run of pipes, one open door with a figure stepping through it. Horizon at 82% of the height; subject at 62% across, 70% down, heading 90° from the picture's up.",
+              "prompt": "The back of a brutalist concrete building: service stairs, a run of pipes, one open door with a figure stepping through it. Black-and-white documentary photograph, natural light, fine grain, deep blacks and clean mid-grays, no color cast, no text, no logos, no borders, no vignette; one clear subject, generous negative space, shot square-on or from directly above, as if for a printed poster — the figure small against architecture or land, going somewhere. Aspect 1:1.5.",
+              "composition": {
+                "horizon": 0.82,
+                "subject": [
+                  0.62,
+                  0.7
+                ],
+                "heading": 90
+              }
+            },
+            "alt": "The red and the grey wall, with photographs on them.",
+            "credit": "AM1R"
+          }
+        }
+      },
+      {
+        "station": 5,
+        "note": {
+          "index": "05",
+          "slug": "samples-and-the-photos",
+          "title": "Samples and the Photos",
+          "genre": "note",
+          "lede": "On resolution, and what it takes to know someone at a higher one.",
+          "status": "published",
+          "year": 2026,
+          "language": "en",
+          "href": "/notes/samples-and-the-photos",
+          "cover": {
+            "image": {
+              "src": "/media/images/afb34f2a03847ed6f9a73788bcb1f6218b51a12ff315f3a249e8dcb0b8ee47d5/1280.webp",
+              "width": 2048,
+              "height": 1152,
+              "sources": [
+                {
+                  "src": "/media/images/afb34f2a03847ed6f9a73788bcb1f6218b51a12ff315f3a249e8dcb0b8ee47d5/640.webp",
+                  "width": 640
+                },
+                {
+                  "src": "/media/images/afb34f2a03847ed6f9a73788bcb1f6218b51a12ff315f3a249e8dcb0b8ee47d5/1280.webp",
+                  "width": 1280
+                },
+                {
+                  "src": "/media/images/afb34f2a03847ed6f9a73788bcb1f6218b51a12ff315f3a249e8dcb0b8ee47d5/2048.webp",
+                  "width": 2048
+                }
+              ]
+            },
+            "slot": {
+              "slot": "cover",
+              "aspect": 1.25,
+              "source": null,
+              "placement": "",
+              "prompt": ""
+            },
+            "alt": "",
+            "credit": "kAre-n"
+          }
+        }
+      },
+      {
+        "station": 6,
+        "note": {
+          "index": "06",
+          "slug": "a-roads-loop",
+          "title": "A Road's Loop.",
+          "genre": "essay",
+          "lede": "Everything on this page moves on a single animation frame, in five phases, in order.",
+          "status": "published",
+          "year": 2026,
+          "language": "en",
+          "href": "/notes/a-roads-loop",
+          "cover": {
+            "image": {
+              "src": "/media/images/151c9c807cf78c0aaae6176d0c68bcbd208ca0690aef3829d3a132cf96a3b3f3/1280.webp",
+              "width": 2048,
+              "height": 1536,
+              "sources": [
+                {
+                  "src": "/media/images/151c9c807cf78c0aaae6176d0c68bcbd208ca0690aef3829d3a132cf96a3b3f3/640.webp",
+                  "width": 640
+                },
+                {
+                  "src": "/media/images/151c9c807cf78c0aaae6176d0c68bcbd208ca0690aef3829d3a132cf96a3b3f3/1280.webp",
+                  "width": 1280
+                },
+                {
+                  "src": "/media/images/151c9c807cf78c0aaae6176d0c68bcbd208ca0690aef3829d3a132cf96a3b3f3/2048.webp",
+                  "width": 2048
+                }
+              ]
+            },
+            "slot": {
+              "slot": "cover",
+              "aspect": 1.25,
+              "source": null,
+              "placement": "",
+              "prompt": ""
+            },
+            "alt": "",
+            "credit": "AM1R",
+            "focus": {
+              "x": 0.581,
+              "y": 0.623
+            },
+            "page": "natural",
+            "plane": "station"
+          }
+        }
+      },
+      {
+        "station": 7,
+        "note": {
+          "index": "07",
+          "slug": "instruments-lie-quietly",
+          "title": "Instruments lie quietly",
+          "genre": "letter",
+          "lede": "Every tool that measured this page once reported a number better than the truth.",
+          "status": "published",
+          "year": 2026,
+          "language": "en",
+          "href": "/notes/instruments-lie-quietly",
+          "cover": {
+            "image": {
+              "src": "/media/images/016622e0d15bf7e680226f2dd7de1aef61fba795ba5bede060593e8cf55ebfca/814.webp",
+              "width": 814,
+              "height": 1279,
+              "sources": [
+                {
+                  "src": "/media/images/016622e0d15bf7e680226f2dd7de1aef61fba795ba5bede060593e8cf55ebfca/640.webp",
+                  "width": 640
+                },
+                {
+                  "src": "/media/images/016622e0d15bf7e680226f2dd7de1aef61fba795ba5bede060593e8cf55ebfca/814.webp",
+                  "width": 814
+                }
+              ]
+            },
+            "slot": {
+              "slot": "06 — NOTES · cover 07 · Instruments lie quietly",
+              "aspect": 0.75,
+              "source": null,
+              "placement": "A surveyor’s level on a tripod standing alone in a bare field, nobody behind it; far off, a figure walking toward the horizon. Horizon at 46% of the height; subject at 30% across, 47% down, heading 0° from the picture's up.",
+              "prompt": "A surveyor’s level on a tripod standing alone in a bare field, nobody behind it; far off, a figure walking toward the horizon. Black-and-white documentary photograph, natural light, fine grain, deep blacks and clean mid-grays, no color cast, no text, no logos, no borders, no vignette; one clear subject, generous negative space, shot square-on or from directly above, as if for a printed poster — the figure small against architecture or land, going somewhere. Aspect 1:1.33.",
+              "composition": {
+                "horizon": 0.46,
+                "subject": [
+                  0.3,
+                  0.47
+                ],
+                "heading": 0
+              }
+            },
+            "alt": "A surveyor’s level on a tripod standing alone in a bare field; far off, a figure walking toward the horizon.",
+            "credit": "Raven."
+          }
+        }
+      },
+      {
+        "station": 8,
+        "note": {
+          "index": "08",
+          "slug": "offline-is-a-place",
+          "title": "Offline is a place",
+          "genre": "log",
+          "lede": "Evîn, and music that keeps playing when the signal is gone.",
+          "status": "published",
+          "year": 2026,
+          "language": "kmr",
+          "href": "/kmr/notes/offline-is-a-place",
+          "cover": {
+            "image": {
+              "src": "/media/images/93d34500b5038449d4cfda2fcb39fe68c8fc645e9ec923f5c55e3988200d6e21/1280.webp",
+              "width": 2048,
+              "height": 1365,
+              "sources": [
+                {
+                  "src": "/media/images/93d34500b5038449d4cfda2fcb39fe68c8fc645e9ec923f5c55e3988200d6e21/640.webp",
+                  "width": 640
+                },
+                {
+                  "src": "/media/images/93d34500b5038449d4cfda2fcb39fe68c8fc645e9ec923f5c55e3988200d6e21/1280.webp",
+                  "width": 1280
+                },
+                {
+                  "src": "/media/images/93d34500b5038449d4cfda2fcb39fe68c8fc645e9ec923f5c55e3988200d6e21/2048.webp",
+                  "width": 2048
+                }
+              ]
+            },
+            "slot": {
+              "slot": "06 — NOTES · cover 08 · Offline is a place",
+              "aspect": 1.5,
+              "source": null,
+              "placement": "A figure on a night bus with headphones on, seen from the aisle; the window beside them black, a single street light streaking across it. Horizon at 50% of the height; subject at 36% across, 55% down, heading 90° from the picture's up.",
+              "prompt": "A figure on a night bus with headphones on, seen from the aisle; the window beside them black, a single street light streaking across it. Black-and-white documentary photograph, natural light, fine grain, deep blacks and clean mid-grays, no color cast, no text, no logos, no borders, no vignette; one clear subject, generous negative space, shot square-on or from directly above, as if for a printed poster — the figure small against architecture or land, going somewhere. Aspect 1.5:1.",
+              "composition": {
+                "horizon": 0.5,
+                "subject": [
+                  0.36,
+                  0.55
+                ],
+                "heading": 90
+              }
+            },
+            "alt": "Kesek di otobusa şevê de bi guhdarkan; pencere reş e, ronahiya kolanê li ser wê dişemite.",
+            "credit": "kAre-n"
+          }
+        }
+      },
+      {
+        "station": 9,
+        "note": {
+          "index": "09",
+          "slug": "the-autumn-light",
+          "title": "The Autumn Light",
+          "genre": "log",
+          "lede": "Why this page lets you carry it by hand in exactly one place.",
+          "status": "published",
+          "year": 2026,
+          "language": "en",
+          "href": "/notes/the-autumn-light",
+          "cover": {
+            "image": {
+              "src": "/media/images/d035f982809da6a79e9f34edb4c9bca9768e0193a3d0d5cd676b01f6e4acb64d/1280.webp",
+              "width": 2048,
+              "height": 1152,
+              "sources": [
+                {
+                  "src": "/media/images/d035f982809da6a79e9f34edb4c9bca9768e0193a3d0d5cd676b01f6e4acb64d/640.webp",
+                  "width": 640
+                },
+                {
+                  "src": "/media/images/d035f982809da6a79e9f34edb4c9bca9768e0193a3d0d5cd676b01f6e4acb64d/1280.webp",
+                  "width": 1280
+                },
+                {
+                  "src": "/media/images/d035f982809da6a79e9f34edb4c9bca9768e0193a3d0d5cd676b01f6e4acb64d/2048.webp",
+                  "width": 2048
+                }
+              ]
+            },
+            "slot": {
+              "slot": "cover",
+              "aspect": 1.25,
+              "source": null,
+              "placement": "",
+              "prompt": ""
+            },
+            "alt": "",
+            "credit": "kAre-n",
+            "focus": {
+              "x": 0.554,
+              "y": 0.496
+            }
+          }
+        }
+      }
+    ]
+  }
+}

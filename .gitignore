@@ -1,0 +1,33 @@
+# Temporary / scratch Python scripts from migration & testing
+capture_*.py
+check_*.py
+crawler.py
+download_*.py
+extract_*.py
+fetch_*.py
+find_*.py
+fix_*.py
+format_*.py
+inspect_*.py
+normalize_*.py
+read_*.py
+remove_*.py
+run_*.py
+test_*.py
+update_*.py
+verify_*.py
+
+# Python environment & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+.venv/
+venv/
+env/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
